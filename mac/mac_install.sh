@@ -41,3 +41,7 @@ curl -L $url -o $file
 # Open the Nord.terminal file, which will install the theme in Terminal
 open $file
 
+echo "source $(brew --prefix)/opt/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
+echo 'alias ls="exa"' >> ~/.zshrc
+source ~/.zshrc
+
