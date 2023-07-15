@@ -61,4 +61,28 @@ Start-Service Docker
 
 Write-Host "`n`t`t" -NoNewline -ForegroundColor Red; Write-Host "Installation Complete!" -ForegroundColor Yellow
 
+
+Write-Host -ForegroundColor Green "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Asking for Github Details ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+Write-Host -ForegroundColor Cyan "Please enter your Github details"
+
+$githubName = Read-Host -Prompt 'Input your Github name'
+$githubEmail = Read-Host -Prompt 'Input your Github email'
+
+Set-ExecutionPolicy Bypass -Scope Process -Force
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+git config --global user.name "$githubName"
+git config --global user.email "$githubEmail"
+
+$updatedGithubName = git config --global user.name
+$updatedGithubEmail = git config --global user.email
+
+Write-Host -ForegroundColor Yellow "Your Github details have been updated to:"
+Write-Host -ForegroundColor White "Github name: $updatedGithubName"
+Write-Host -ForegroundColor White "Github email: $updatedGithubEmail"
+
+Write-Host -ForegroundColor Green "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+
 Restart-Computer
