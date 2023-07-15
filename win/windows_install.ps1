@@ -7,6 +7,7 @@ echo "================ Installing Choco"
 
 Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 choco install -y GoogleChrome nodejs powertoys steam visualstudiocode vlc vscode winrar brave ferdium slack amazon-chime amazon-workspaces plex
+
 echo "================ Oh My Posh Choco"
 winget install JanDeDobbeleer.OhMyPosh -s winget
 (Get-Command oh-my-posh).Source
