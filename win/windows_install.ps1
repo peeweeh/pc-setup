@@ -5,9 +5,14 @@ Write-Host -ForegroundColor Green "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 # 1Password
 # ----------------------------------------------
 Write-Host "`n`t`t" -NoNewline -ForegroundColor Red; Write-Host "Installing 1Password" -ForegroundColor Yellow 
-Invoke-WebRequest -Uri "https://downloads.1password.com/win/1PasswordSetup-latest.exe" -OutFile "https://downloads.1password.com/win/1PasswordSetup-latest.exe"
-Start-Process -FilePath "1PasswordInstaller.exe" -ArgumentList "/S"
 
+$Url = "https://downloads.1password.com/win/1PasswordSetup-latest.exe"
+
+$Output = "$env:TEMP\1PasswordSetup.exe"
+
+Invoke-WebRequest -Uri $Url -OutFile $Output
+
+Start-Process -FilePath $Output -ArgumentList
 # ----------------------------------------------
 # Chocolatey
 # ----------------------------------------------
@@ -19,8 +24,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.We
 # ----------------------------------------------
 $appList = "git", "GoogleChrome", "nodejs", "powertoys", "visualstudiocode", 
 "vlc", "vscode", "winrar", "brave", "ferdium", "slack", "amazon-chime", "amazon-workspaces", 
-"googledrive", "plex", "nerd-fonts-firacode", "nerd-fonts-firamono", "postman", "fzf", "bat", 
-"nordvpn", "steam"
+"googledrive", "plex", "nerd-fonts-firacode", "nerd-fonts-firamono", "postman", "fzf", "bat", "steam"
 
 # ----------------------------------------------
 # Installing Applications via Chocolatey
@@ -52,12 +56,15 @@ wsl --install -d Ubuntu;
 # ----------------------------------------------
 Write-Host "`n`t`t" -NoNewline -ForegroundColor Red; Write-Host "Installing Docker Desktop" -ForegroundColor Yellow
 
-$url = "https://download.docker.com/win/stable/Docker%20Desktop%20Installer.exe"
-Invoke-WebRequest -Uri $url -OutFile "$env:TEMP\DockerDesktopInstaller.exe"
+# Define the URL
+$Url = "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
 
-# Install Docker Desktop
-Start-Process -FilePath "$env:TEMP\DockerDesktopInstaller.exe" -ArgumentList "/S" -Wait
-Start-Service Docker
+$Output = "$env:TEMP\DockerDesktopInstaller.exe"
+
+Invoke-WebRequest -Uri $Url -OutFile $Output -UserAgent "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.19041.610"
+
+Start-Process -FilePath $Output
+
 
 Write-Host "`n`t`t" -NoNewline -ForegroundColor Red; Write-Host "Installation Complete!" -ForegroundColor Yellow
 
