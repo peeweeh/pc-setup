@@ -30,9 +30,6 @@ else
   exit 1
 fi
 
-# Add Powerlevel10k theme to .zshrc
-echo "source $(brew --prefix)/opt/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
-
 
 # Note: No need to source .zshrc here, changes will take effect in the next shell session
 
