@@ -1,242 +1,301 @@
 #!/bin/bash
+#
+# macOS System Optimization & Configuration Script
+# Author: mrfixit027
+# Repository: https://github.com/peeweeh/pc-setup
+#
+# This script applies performance optimizations and UI improvements.
+# For comprehensive privacy hardening, also run: privacy.sh
+#
+# Quick start:
+#   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_install.sh)"
+#
+
+set -e  # Exit on error
+set -u  # Exit on undefined variable
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_info() {
+    echo -e "${GREEN}✓${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}✗${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
+print_header() {
+    echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${MAGENTA}$1${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+}
+
+print_header "macOS System Optimization & Configuration"
+echo -e "${CYAN}Author: mrfixit027 | https://github.com/peeweeh/pc-setup${NC}\n"
 
 # Install Oh My Zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
-# Auto hide the dock
-defaults write com.apple.dock autohide -bool true
-
-# Remove all items from the dock
-defaults write com.apple.dock persistent-apps -array
-
-# Resize the dock to 50%
-defaults write com.apple.dock tilesize -int 36
-
-# Restart the dock for changes to take effect
-killall Dock
-
-# Define the URL of the Nord.terminal file
-url="https://raw.githubusercontent.com/nordtheme/terminal-app/develop/src/xml/Nord.terminal"
-
-# Define the local file path
-file="$HOME/Downloads/Nord.terminal"
-
-# Download the Nord.terminal file
-if curl -L "$url" -o "$file"; then
-  # Open the Nord.terminal file, which will install the theme in Terminal
-  open "$file"
+if [[ ! -d ~/.oh-my-zsh ]]; then
+    print_info "Installing Oh My Zsh..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 else
-  echo "Failed to download Nord.terminal file"
-  exit 1
+    print_warning "Oh My Zsh already installed, skipping..."
 fi
 
+print_header "PERFORMANCE & BATTERY OPTIMIZATION"
 
-# Note: No need to source .zshrc here, changes will take effect in the next shell session
+print_warning "For comprehensive Siri/privacy settings, also run: privacy.sh"
 
-# Additional macOS optimizations
+print_info "Disabling Photos AI analysis (huge battery saver)..."
+launchctl disable gui/$UID/com.apple.photoanalysisd 2>/dev/null || true
+launchctl kill -TERM gui/$UID/com.apple.photoanalysisd 2>/dev/null || true
 
-# Speed up Mission Control animations
-defaults write com.apple.dock expose-animation-duration -float 0.1
+print_info "Disabling Media AI analysis (video indexing)..."
+launchctl disable gui/$UID/com.apple.mediaanalysisd 2>/dev/null || true
+launchctl kill -TERM gui/$UID/com.apple.mediaanalysisd 2>/dev/null || true
 
-# Disable Dashboard
-defaults write com.apple.dashboard mcx-disabled -bool true
+print_info "Disabling Game Center daemon..."
+defaults write com.apple.gamed Disabled -bool true
+launchctl kill -TERM gui/$UID/com.apple.gamed 2>/dev/null || true
 
-# Don’t show recent applications in Dock
-defaults write com.apple.dock show-recents -bool false
+print_info "Fixing macOS 26 heuristic lag bug..."
+defaults write -g NSAutoHeuristicEnabled -bool false
+killall cfprefsd 2>/dev/null || true
 
-# Automatically quit the printer app once the print jobs complete
-defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+print_info "Optimizing Electron app GPU usage (Chrome/Slack/VSCode)..."
+launchctl setenv CHROME_HEADLESS 1
 
-# Disable the “Are you sure you want to open this application?” dialog
-defaults write com.apple.LaunchServices LSQuarantine -bool false
+print_info "Disabling Spotlight disk indexing (saves I/O, breaks file search)..."
+print_warning "Note: This will disable Spotlight search functionality"
+sudo mdutil -i off -a 2>/dev/null || true
 
-# Remove the delay when hiding and showing the Dock
+print_info "Disabling crash reporter dialogs..."
+defaults write com.apple.CrashReporter DialogType -string "none"
+
+print_header "UI SPEED OPTIMIZATIONS"
+
+print_info "Making window resize instant..."
+defaults write -g NSWindowResizeTime -float 0.001
+
+print_info "Making Dock appear instantly (no hover delay)..."
 defaults write com.apple.dock autohide-delay -float 0
-defaults write com.apple.dock autohide-time-modifier -float 0.5
+defaults write com.apple.dock autohide-time-modifier -float 0
 
-# Show all file extensions in Finder
-defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-
-# Show hidden files in Finder
-defaults write com.apple.finder AppleShowAllFiles -bool true
-
-# Disable the warning when changing a file extension
-defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
-
-# Avoid creating .DS_Store files on network or USB volumes
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
-
-# Expand save panel by default
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
-
-# Expand print panel by default
-defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
-defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
-
-# Disable the sound effects on boot
-sudo nvram SystemAudioVolume=" "
-
-# Disable auto-correct
-defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-
-# Disable smart quotes as they’re annoying when typing code
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
-
-# Disable smart dashes as they’re annoying when typing code
-defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
-
-# Set a blazingly fast keyboard repeat rate
-defaults write NSGlobalDomain KeyRepeat -int 1
-defaults write NSGlobalDomain InitialKeyRepeat -int 10
-
-# Require password immediately after sleep or screen saver begins
-defaults write com.apple.screensaver askForPassword -int 1
-defaults write com.apple.screensaver askForPasswordDelay -int 0
-
-# Disable automatic termination of inactive apps
-defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true
-
-# Disable the animation when you change pages in the Launchpad
-defaults write com.apple.dock springboard-page-duration -float 0
-
-# Disable the animation when opening applications from the Dock
-defaults write com.apple.dock launchanim -bool false
-
-# Speed up the animation when opening the Info window in Finder
+print_info "Disabling Finder animations..."
 defaults write com.apple.finder DisableAllAnimations -bool true
 
-# Disable the animation when opening the Get Info window in Finder
+print_info "Speeding up Mission Control animations..."
+defaults write com.apple.dock expose-animation-duration -float 0.1
+
+print_info "Disabling Launchpad page change animation..."
+defaults write com.apple.dock springboard-page-duration -float 0
+
+print_info "Disabling Dock launch animation..."
+defaults write com.apple.dock launchanim -bool false
+
+print_info "Disabling Finder Info window animation..."
 defaults write com.apple.finder AnimateInfoPanes -bool false
 
-# Set Spotlight search to use Control + Space instead of Command + Space
-/usr/libexec/PlistBuddy -c "Set :AppleSymbolicHotKeys:64:enabled true" ~/Library/Preferences/com.apple.symbolichotkeys.plist
-/usr/libexec/PlistBuddy -c "Set :AppleSymbolicHotKeys:64:value:parameters:0 32" ~/Library/Preferences/com.apple.symbolichotkeys.plist
-/usr/libexec/PlistBuddy -c "Set :AppleSymbolicHotKeys:64:value:parameters:1 49" ~/Library/Preferences/com.apple.symbolichotkeys.plist
-/usr/libexec/PlistBuddy -c "Set :AppleSymbolicHotKeys:64:value:parameters:2 262144" ~/Library/Preferences/com.apple.symbolichotkeys.plist
+print_header "DOCK CONFIGURATION"
 
-# Restart SystemUIServer to apply changes
-killall SystemUIServer
+print_info "Enabling auto-hide for Dock..."
+defaults write com.apple.dock autohide -bool true
 
-# Show battery percentage in the menu bar
-defaults write com.apple.menuextra.battery ShowPercent -string "YES"
+print_info "Removing all items from Dock..."
+defaults write com.apple.dock persistent-apps -array
 
-# Disable automatic period substitution
-defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+print_info "Resizing Dock to 50%..."
+defaults write com.apple.dock tilesize -int 36
 
-# Disable automatic text correction
-defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+print_info "Hiding recent applications in Dock..."
+defaults write com.apple.dock show-recents -bool false
 
-# Disable automatic text replacement
-defaults write NSGlobalDomain NSAutomaticTextReplacementEnabled -bool false
-
-# Disable automatic quote substitution
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
-
-# Disable automatic dash substitution
-defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
-
-# Enable tap to click for the current user and the login screen
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
-defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
-
-# Enable three-finger drag
-defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true
-
-# Disable Dashboard
+print_info "Disabling Dashboard..."
 defaults write com.apple.dashboard mcx-disabled -bool true
-
-# Don’t show Dashboard as a Space
 defaults write com.apple.dock dashboard-in-overlay -bool true
 
+print_header "FINDER CONFIGURATION"
 
-# Set the default location for screenshots to ~/Documents/Screenshots
-mkdir -p ~/Documents/Screenshots
-defaults write com.apple.screencapture location ~/Documents/Screenshots
-killall SystemUIServer
-
-
-# Set new Finder windows to open in the home folder, show the sidebar, and show the toolbar
+print_info "Setting new Finder windows to open Home folder..."
 defaults write com.apple.finder NewWindowTarget -string "PfLo"
 defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"
+
+print_info "Showing Finder sidebar and toolbar..."
 defaults write com.apple.finder ShowSidebar -bool true
 defaults write com.apple.finder ShowToolbar -bool true
 
-# Show all file extensions
+print_info "Showing all file extensions..."
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
-# Show hidden files
+print_info "Showing hidden files..."
 defaults write com.apple.finder AppleShowAllFiles -bool true
 
-# Show path bar
+print_info "Showing path bar..."
 defaults write com.apple.finder ShowPathbar -bool true
 
-# Show status bar
+print_info "Showing status bar..."
 defaults write com.apple.finder ShowStatusBar -bool true
 
-# Keep folders on top when sorting by name
+print_info "Keeping folders on top when sorting..."
 defaults write com.apple.finder _FXSortFoldersFirst -bool true
 
-# Set Finder to sort by date modified
+print_info "Setting Finder to sort by date modified..."
 defaults write com.apple.finder FXPreferredGroupBy -string "DateModified"
 
-
-# When performing a search, search the current folder by default
+print_info "Setting search scope to current folder..."
 defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
 
-# Enable spring loading for directories
-defaults write NSGlobalDomain com.apple.springing.enabled -bool true
+print_info "Disabling file extension change warning..."
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 
-# Remove the delay for spring loading
-defaults write NSGlobalDomain com.apple.springing.delay -float 0
-
-# Avoid creating .DS_Store files on network or USB volumes
+print_info "Preventing .DS_Store files on network/USB volumes..."
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 
-# Set Finder to default to column view for everything
+print_info "Setting column view as default..."
 defaults write com.apple.finder FXPreferredViewStyle -string "clmv"
 
-# Expand the following File Info panes: “General”, “Open with”, and “Sharing & Permissions”
+print_info "Expanding File Info panes..."
 defaults write com.apple.finder FXInfoPanesExpanded -dict \
     General -bool true \
     OpenWith -bool true \
     Privileges -bool true
-# Remove Network from Locations but ensure Computer (Hostname) is there
-defaults write com.apple.finder SidebarDevicesSectionDisclosedState -bool true
-defaults write com.apple.finder SidebarNetworkSectionDisclosedState -bool false
 
-# Show only Home, AirDrop, Downloads, and iCloud in the sidebar
-defaults write com.apple.sidebarlists favoriteitems -array \
-  '{"Name"="Home"; "EntryType"="com.apple.LSSharedFileList.FavoriteItems";}' \
-  '{"Name"="AirDrop"; "EntryType"="com.apple.LSSharedFileList.FavoriteItems";}' \
-  '{"Name"="Downloads"; "EntryType"="com.apple.LSSharedFileList.FavoriteItems";}' \
-  '{"Name"="iCloud"; "EntryType"="com.apple.LSSharedFileList.FavoriteItems";}'
-
-# Set Finder window to open Home directory by default
-osascript -e 'tell application "Finder" to set target of Finder window 1 to (path to home folder)'
-
-# Hide recent tags in Finder
+print_info "Hiding recent tags..."
 defaults write com.apple.finder ShowRecentTags -bool false
 
-# Restart Finder for changes to take effect
+print_info "Enabling spring loading for directories..."
+defaults write NSGlobalDomain com.apple.springing.enabled -bool true
 
-# Restart Finder to apply changes
-killall Finder
+print_info "Removing spring loading delay..."
+defaults write NSGlobalDomain com.apple.springing.delay -float 0
 
-# Restart affected applications
-for app in "Dock" "Finder" "SystemUIServer"; do
-  killall "${app}" &> /dev/null
-done
+print_header "SYSTEM PREFERENCES"
 
+print_info "Expanding save panel by default..."
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
 
-# Enable automatic updates for macOS and App Store
-sudo softwareupdate --schedule on
+print_info "Expanding print panel by default..."
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
+
+print_info "Auto-quit printer app after jobs complete..."
+defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+
+print_info "Disabling app quarantine dialog..."
+defaults write com.apple.LaunchServices LSQuarantine -bool false
+
+print_info "Disabling boot sound effects..."
+sudo nvram SystemAudioVolume=" " 2>/dev/null || true
+
+print_info "Disabling auto-correct..."
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+
+print_info "Disabling smart quotes..."
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+
+print_info "Disabling smart dashes..."
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+
+print_info "Disabling automatic period substitution..."
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+
+print_info "Disabling automatic text replacement..."
+defaults write NSGlobalDomain NSAutomaticTextReplacementEnabled -bool false
+
+print_info "Setting blazingly fast keyboard repeat rate..."
+defaults write NSGlobalDomain KeyRepeat -int 1
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
+
+print_info "Requiring password immediately after sleep..."
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
+
+print_info "Disabling automatic termination of inactive apps..."
+defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true
+
+print_header "TRACKPAD CONFIGURATION"
+
+print_info "Enabling tap to click..."
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+
+print_info "Enabling three-finger drag..."
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true
+
+print_header "SCREENSHOTS CONFIGURATION"
+
+print_info "Creating Screenshots folder..."
+mkdir -p ~/Documents/Screenshots
+
+print_info "Setting screenshot location to ~/Documents/Screenshots..."
+defaults write com.apple.screencapture location ~/Documents/Screenshots
+
+print_header "MENU BAR CONFIGURATION"
+
+print_info "Showing battery percentage..."
+defaults write com.apple.menuextra.battery ShowPercent -string "YES"
+
+print_header "SOFTWARE UPDATES"
+
+print_info "Enabling automatic updates..."
+sudo softwareupdate --schedule on 2>/dev/null || true
 defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
 defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
 defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
 defaults write com.apple.commerce AutoUpdate -bool true
 defaults write com.apple.commerce AutoUpdateRestartRequired -bool true
+
+print_header "TERMINAL THEME INSTALLATION"
+
+url="https://raw.githubusercontent.com/nordtheme/terminal-app/develop/src/xml/Nord.terminal"
+file="$HOME/Downloads/Nord.terminal"
+
+print_info "Downloading Nord Terminal theme..."
+if curl -L "$url" -o "$file"; then
+  print_info "Installing Nord theme (will open in Terminal)..."
+  open "$file"
+else
+  print_error "Failed to download Nord.terminal file"
+fi
+
+print_header "APPLYING CHANGES"
+
+print_info "Restarting Dock..."
+killall Dock 2>/dev/null || true
+
+print_info "Restarting Finder..."
+killall Finder 2>/dev/null || true
+
+print_info "Restarting SystemUIServer..."
+killall SystemUIServer 2>/dev/null || true
+
+print_header "INSTALLATION COMPLETE"
+
+print_info "${GREEN}All optimizations applied successfully!${NC}"
+print_info ""
+print_warning "Please note:"
+echo "  • Spotlight search has been disabled (saves battery/CPU)"
+echo "  • Photos and Media AI analysis are disabled"
+echo "  • For comprehensive Siri/privacy settings, run: privacy.sh"
+echo ""
+print_info "To revert any changes, check the documentation or use:"
+echo "  • Spotlight: sudo mdutil -i on -a"
+echo "  • Photos: launchctl enable gui/\$UID/com.apple.photoanalysisd"
+echo "  • Media: launchctl enable gui/\$UID/com.apple.mediaanalysisd"
+echo ""
+print_info "${CYAN}Please restart your Mac for all changes to take full effect.${NC}"

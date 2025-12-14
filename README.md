@@ -49,25 +49,76 @@ Installs Visual Studio Code extensions
 
 ## 🍎 macOS Setup
 
+### 🚀 Interactive Installer (Recommended)
+
+**Run this command in Terminal** for an interactive menu:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/install.sh)
+```
+
+**Choose from:**
+1. **Install Applications** (brew_install.sh) - 40+ apps via Homebrew
+2. **Optimize System** (mac_install.sh) - Performance & UI tweaks
+3. **Install Extensions** (vscode.sh) - 68+ VS Code extensions
+4. **Privacy Hardening** (privacy.sh) - Advanced privacy settings
+5. **Install ALL** - Run all scripts in sequence
+
+### Quick Start (Individual Scripts)
+
+**Just install apps:**
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/brew_install.sh)"
+```
+
+**Just optimize system:**
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_install.sh)"
+```
+
 ### Scripts
 
 #### `brew_install.sh`
-Installs applications and tools via Homebrew:
-- Development tools (Git, VS Code, Docker, Postman)
-- Browsers (Chrome, Brave)
-- Communication (Slack, Teams, Discord)
-- Utilities (1Password, VLC, Rectangle)
-- CLI tools (bat, fzf, exa)
+Comprehensive Homebrew installation script with:
+- **Automatic Homebrew installation** if not present
+- **Priority app installation** (1Password, Arc first)
+- **Smart ordering** - Fast apps first, heavy apps last
+- **Idempotent** - Safe to run multiple times
+- **Error handling** and colored output
+- 40+ applications including:
+  - Development tools (Git, VS Code, Docker, Postman, Warp)
+  - Browsers (Chrome, Brave, Arc)
+  - Communication (Slack, Teams, Discord, Signal, WhatsApp)
+  - Utilities (1Password, Rectangle, Raycast, BetterMouse)
+  - CLI tools (bat, fzf, eza, btop, go, node, ollama)
 
 #### `mac_install.sh`
-Customizes macOS system settings:
-- Dock configuration (auto-hide, size, cleanup)
-- Finder customization
-- Terminal theme (Nord)
-- Shell configuration (Powerlevel10k)
+System optimization and customization script with:
+- **Performance & Battery Optimization** - Disables Siri, Photos AI, Media AI, Game Center
+- **UI Speed Improvements** - Instant animations, faster Mission Control, no delays
+- **Dock Configuration** - Auto-hide, clean layout, no recent apps
+- **Finder Customization** - Show hidden files, extensions, path bar, status bar
+- **System Preferences** - Fast keyboard, trackpad gestures, security settings
+- **Terminal Theme** - Nord theme installation
+- Includes all optimizations from the performance tweaks table
 
 #### `vscode.sh`
-Installs Visual Studio Code extensions
+Installs 68+ VS Code extensions organized by category:
+- AI assistants (GitHub Copilot, Amazon Q, Claude)
+- Themes and icons
+- Language support (Python, JavaScript, Go, GraphQL)
+- DevOps tools (Docker, Kubernetes, Terraform)
+- Git tools (GitLens, Git History)
+- With colored output and progress tracking
+
+#### `privacy.sh`
+Advanced privacy and security hardening (831 lines):
+- **Comprehensive Siri disabling** - All Siri services and data collection
+- **Telemetry disabling** - Firefox, Office, Homebrew, .NET Core, PowerShell
+- **Cache clearing** - System, user, CUPS, DNS, Xcode
+- **Privacy hardening** - Firewall, remote access, location services
+- **iCloud settings** - Document storage, sync preferences
+- ⚠️ **Note**: This is an advanced script. Review before running.
 
 ## 📦 Prerequisites
 
