@@ -131,7 +131,7 @@ done
 
 # Install fonts
 print_info "Installing fonts..."
-brew tap homebrew/cask-fonts
+#brew tap homebrew/cask-fonts
 
 fonts=(
   font-fira-code
