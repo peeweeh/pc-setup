@@ -1,6 +1,10 @@
-﻿# vscode_extensions.ps1
+﻿################################################################################
+# vscode_extensions.ps1
 # VS Code Extensions Installer
+#
 # Author: @mrfixit027
+# GitHub: https://github.com/peeweeh/pc-setup
+################################################################################
 
 # List all extensions installed in VS Code
 $vscodeExtensions = @(
@@ -68,3 +72,9 @@ $scriptContent = foreach ($extension in $vscodeExtensions) {
 }
 
 $scriptContent | Out-File -Encoding UTF8 -FilePath 'InstallVsCodeExtensions.ps1'
+
+################################################################################
+# End of vscode_extensions.ps1
+# Author: @mrfixit027
+# GitHub: https://github.com/peeweeh/pc-setup
+################################################################################

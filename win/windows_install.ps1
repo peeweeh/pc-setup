@@ -1,6 +1,10 @@
+################################################################################
 # windows_install.ps1
 # Chocolatey package installation script for Windows
+#
 # Author: @mrfixit027
+# GitHub: https://github.com/peeweeh/pc-setup
+################################################################################
 
 # Check if running as Administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -382,4 +386,11 @@ Write-Host "Setup Complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Please restart your computer for all changes to take effect." -ForegroundColor Yellow
+Write-Host ""
+
+################################################################################
+# End of windows_install.ps1
+# Author: @mrfixit027
+# GitHub: https://github.com/peeweeh/pc-setup
+################################################################################
 

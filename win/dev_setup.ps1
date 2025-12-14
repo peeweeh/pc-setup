@@ -1,7 +1,11 @@
+################################################################################
 # dev_setup.ps1
 # Development environment setup for Windows
 # Installs WSL, Docker, Node.js, Python tools, and configures Git & AWS
+#
 # Author: @mrfixit027
+# GitHub: https://github.com/peeweeh/pc-setup
+################################################################################
 
 # Check if running as Administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -505,3 +509,9 @@ if ($restart -eq "y") {
     Start-Sleep -Seconds 10
     Restart-Computer -Force
 }
+
+################################################################################
+# End of dev_setup.ps1
+# Author: @mrfixit027
+# GitHub: https://github.com/peeweeh/pc-setup
+################################################################################

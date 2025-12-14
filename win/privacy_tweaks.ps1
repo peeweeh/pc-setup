@@ -1,7 +1,11 @@
+################################################################################
 # privacy_tweaks.ps1
 # Comprehensive Windows privacy tweaks extracted from privacy.sexy
 # This script applies advanced privacy settings and removes telemetry
+#
 # Author: @mrfixit027
+# GitHub: https://github.com/peeweeh/pc-setup
+################################################################################
 
 # Check if running as Administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -452,3 +456,10 @@ Write-Host "Please restart your computer for all changes to take effect." -Foreg
 Write-Host ""
 Write-Host "Note: This script applies privacy tweaks from privacy.sexy" -ForegroundColor Gray
 Write-Host "Source: https://privacy.sexy" -ForegroundColor Gray
+Write-Host ""
+
+################################################################################
+# End of privacy_tweaks.ps1
+# Author: @mrfixit027
+# GitHub: https://github.com/peeweeh/pc-setup
+################################################################################

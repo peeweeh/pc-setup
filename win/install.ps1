@@ -1,7 +1,11 @@
+################################################################################
 # install.ps1
 # Master installer for PC Setup automation
 # Interactive menu-driven setup orchestrator
+#
 # Author: @mrfixit027
+# GitHub: https://github.com/peeweeh/pc-setup
+################################################################################
 
 # Check if running as Administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -215,3 +219,9 @@ do {
         }
     }
 } while ($true)
+
+################################################################################
+# End of install.ps1
+# Author: @mrfixit027
+# GitHub: https://github.com/peeweeh/pc-setup
+################################################################################
