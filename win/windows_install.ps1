@@ -282,7 +282,118 @@ try {
 Write-Host "- Disabling location tracking..." -ForegroundColor Cyan
 if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" "DisableLocation" 1) { $tweakCount++ } else { $tweakErrors++ }
 
-# Summary
+# Disable Wi-Fi Sense
+Write-Host "- Disabling Wi-Fi sense..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting" "Value" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots" "Value" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Enable End Task with Right Click
+Write-Host "- Enabling end task with right click..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" "TaskbarEndTask" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Notifications
+Write-Host "- Disabling notifications..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings" "NOC_GLOBAL_SETTING_ALLOW_NOTIFICATION_SOUND" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable App Suggestions
+Write-Host "- Disabling app suggestions..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "ContentDeliveryAllowed" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "OemPreInstalledAppsEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "PreInstalledAppsEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "SilentInstalledAppsEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "SystemPanelFirstRunCompleted" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Background Apps
+Write-Host "- Disabling background apps..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" "GlobalUserDisabled" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Telemetry Services
+Write-Host "- Disabling telemetry services..." -ForegroundColor Cyan
+try {
+    Stop-Service -Name "DiagTrack" -ErrorAction SilentlyContinue
+    Set-Service -Name "DiagTrack" -StartupType Disabled -ErrorAction SilentlyContinue
+    $tweakCount++
+} catch {
+    $tweakErrors++
+}
+
+try {
+    Stop-Service -Name "dmwappushservice" -ErrorAction SilentlyContinue
+    Set-Service -Name "dmwappushservice" -StartupType Disabled -ErrorAction SilentlyContinue
+    $tweakCount++
+} catch {
+    $tweakErrors++
+}
+
+# Disable Cortana
+Write-Host "- Disabling Cortana..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Personalization\Settings" "AcceptedPrivacyPolicy" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" "AllowCortana" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Bing Search in Start Menu
+Write-Host "- Disabling Bing search in Start menu..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" "BingSearchEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" "CortanaConsent" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Ad ID
+Write-Host "- Disabling advertising ID..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" "Enabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Connected User Experiences
+Write-Host "- Disabling connected user experiences..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" "EnableCdp" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable App Launch Tracking
+Write-Host "- Disabling app launch tracking..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" "Start_TrackProgs" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Tips and Suggestions
+Write-Host "- Disabling tips and suggestions..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CloudStore\Store\Cache\DefaultAccount\*" "IsContentDirty" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" "NoInstrumentation" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Delivery Optimization
+Write-Host "- Disabling delivery optimization..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" "DODownloadMode" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Error Reporting
+Write-Host "- Disabling error reporting..." -ForegroundColor Cyan
+try {
+    Stop-Service -Name "WerSvc" -ErrorAction SilentlyContinue
+    Set-Service -Name "WerSvc" -StartupType Disabled -ErrorAction SilentlyContinue
+    $tweakCount++
+} catch {
+    $tweakErrors++
+}
+
+# Disable Connect to Suggested Open With
+Write-Host "- Disabling connect to suggested open with..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" "NoUseStoreOpenWith" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Autoplay
+Write-Host "- Disabling autoplay..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" "DisableAutoplay" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Set Services to Manual
+Write-Host "- Setting services to manual startup..." -ForegroundColor Cyan
+$servicesToDisable = @(
+    "WSearch",           # Windows Search
+    "DiagTrack",         # Diagnostic Tracking Service
+    "dmwappushservice",  # Device Management Wireless Application Protocol
+    "MapsBroker",        # Maps
+    "lfsvc",             # Location Service
+    "RemoteRegistry",    # Remote Registry
+    "SharedAccess"       # Internet Connection Sharing
+)
+
+foreach ($service in $servicesToDisable) {
+    try {
+        Set-Service -Name $service -StartupType Manual -ErrorAction SilentlyContinue
+        $tweakCount++
+    } catch {
+        $tweakErrors++
+    }
+}
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Tweaks Summary" -ForegroundColor Cyan
