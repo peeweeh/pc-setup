@@ -58,7 +58,7 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1"
 **Purpose:** Comprehensive privacy and telemetry configuration extracted from privacy.sexy framework.
 
 **Features:**
-- 40+ registry modifications for privacy settings
+- 60+ registry modifications for privacy and security
 - Service management (disables DiagTrack, dmwappushservice, WerSvc)
 - Removes telemetry and tracking:
   - Windows diagnostic data and feedback
@@ -67,14 +67,30 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1"
   - Advertising ID and personalized ads
   - Cloud-based speech recognition
   - Inking and typing personalization
+  - Typing feedback and input personalization
+  - .NET Core and PowerShell telemetry
 - System cleanup:
   - Removes controversial `defaultuser0` account
+  - Removes default app associations
   - Clears SRUM (System Resource Usage Monitor) database
 - User experience settings:
   - Disables app suggestions and Start menu suggestions
   - Disables connected experiences
   - Disables clipboard history
   - Disables settings synchronization
+  - Disables lock screen camera and app notifications
+- Security hardening:
+  - Disables PowerShell 2.0 (downgrade protection)
+  - Enables SEHOP (Structured Exception Handling Protection)
+  - Disables Windows Installer elevated privileges
+  - Disables LAN Manager password hash storage
+  - Disables Windows DRM internet access
+  - Disables device sensors
+- Device management:
+  - Disables AutoPlay and AutoRun
+  - Disables Windows Connect Now wizard
+  - Disables automatic map downloads
+  - Blocks 30+ malicious telemetry domains in hosts file
 
 **Key Functions:**
 - `Set-RegistryValue` - Helper function for safe registry modifications
@@ -97,6 +113,14 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\privacy_tweaks.ps1"
 - **Services** - DiagTrack, dmwappushservice, WerSvc (disabled)
 - **Content Delivery Manager** - App suggestions disabled
 - **Windows Search** - Cortana disabled
+- **Maps** - AutoDownloadAndUpdateMapData disabled
+- **GameDVR** - AllowGameDVR disabled
+- **WMDRM** - DisableOnline (DRM internet access)
+- **TIPC** - Typing feedback disabled
+- **Sensors** - Device sensors disabled
+- **Explorer** - NoDriveTypeAutoRun, NoAutorun, NoAutoplayfornonVolume
+- **Security** - SEHOP enabled, PowerShell 2.0 disabled, LAN hashes disabled
+- **Hosts File** - 30+ telemetry domains blocked
 
 **Warnings:**
 - Some users may prefer Windows telemetry for troubleshooting

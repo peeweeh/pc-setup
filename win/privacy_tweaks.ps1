@@ -171,6 +171,162 @@ try {
     $tweakErrors++
 }
 
+# Remove default apps associations
+Write-Host "- Removing default app associations..." -ForegroundColor Cyan
+try {
+    dism /online /Remove-DefaultAppAssociations 2>$null | Out-Null
+    $tweakCount++
+} catch {
+    $tweakErrors++
+}
+
+# Disable device sensors
+Write-Host "- Disabling device sensors..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" "DisableSensors" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable website access of language list
+Write-Host "- Disabling website access of language list..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\Control Panel\International\User Profile" "HttpAcceptLanguageOptOut" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable automatic map downloads
+Write-Host "- Disabling automatic map downloads..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Maps" "AllowUntriggeredNetworkTrafficOnSettingsPage" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Maps" "AutoDownloadAndUpdateMapData" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable GameDVR policy
+Write-Host "- Disabling GameDVR policy..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR" "AllowGameDVR" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Windows DRM internet access
+Write-Host "- Disabling Windows DRM internet access..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\WMDRM" "DisableOnline" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable typing feedback
+Write-Host "- Disabling typing feedback..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\Input\TIPC" "Enabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Input\TIPC" "Enabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Activity Feed policy
+Write-Host "- Disabling Activity Feed policy..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" "EnableActivityFeed" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable .NET Core CLI telemetry
+Write-Host "- Disabling .NET Core CLI telemetry..." -ForegroundColor Cyan
+try {
+    [Environment]::SetEnvironmentVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1", "User")
+    $tweakCount++
+} catch {
+    $tweakErrors++
+}
+
+# Disable PowerShell telemetry
+Write-Host "- Disabling PowerShell telemetry..." -ForegroundColor Cyan
+try {
+    [Environment]::SetEnvironmentVariable("POWERSHELL_TELEMETRY_OPTOUT", "1", "User")
+    $tweakCount++
+} catch {
+    $tweakErrors++
+}
+
+# Disable AutoPlay and AutoRun
+Write-Host "- Disabling AutoPlay and AutoRun..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" "NoDriveTypeAutoRun" 255) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" "NoAutorun" 1) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Explorer" "NoAutoplayfornonVolume" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable lock screen camera access
+Write-Host "- Disabling lock screen camera access..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization" "NoLockScreenCamera" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable storage of LAN Manager password hashes
+Write-Host "- Disabling LAN Manager password hash storage..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" "NoLMHash" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Always Install with Elevated Privileges
+Write-Host "- Disabling Always Install with Elevated Privileges..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Installer" "AlwaysInstallElevated" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Enable SEHOP (Structured Exception Handling Overwrite Protection)
+Write-Host "- Enabling SEHOP..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" "DisableExceptionChainValidation" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable PowerShell 2.0
+Write-Host "- Disabling PowerShell 2.0..." -ForegroundColor Cyan
+try {
+    Disable-WindowsOptionalFeature -FeatureName "MicrosoftWindowsPowerShellV2" -Online -NoRestart -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+    Disable-WindowsOptionalFeature -FeatureName "MicrosoftWindowsPowerShellV2Root" -Online -NoRestart -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+    $tweakCount++
+} catch {
+    $tweakErrors++
+}
+
+# Disable Windows Connect Now wizard
+Write-Host "- Disabling Windows Connect Now wizard..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\Software\Policies\Microsoft\Windows\WCN\UI" "DisableWcnUi" 1) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars" "EnableRegistrars" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Block telemetry and crash report hosts
+Write-Host "- Blocking telemetry hosts in hosts file..." -ForegroundColor Cyan
+$hostsPath = "$env:SystemRoot\System32\drivers\etc\hosts"
+$domainsToBlock = @(
+    "oca.telemetry.microsoft.com",
+    "oca.microsoft.com",
+    "kmwatsonc.events.data.microsoft.com",
+    "watson.telemetry.microsoft.com",
+    "umwatsonc.events.data.microsoft.com",
+    "ceuswatcab01.blob.core.windows.net",
+    "ceuswatcab02.blob.core.windows.net",
+    "eaus2watcab01.blob.core.windows.net",
+    "eaus2watcab02.blob.core.windows.net",
+    "weus2watcab01.blob.core.windows.net",
+    "weus2watcab02.blob.core.windows.net",
+    "co4.telecommand.telemetry.microsoft.com",
+    "cs11.wpc.v0cdn.net",
+    "cs1137.wpc.gammacdn.net",
+    "modern.watson.data.microsoft.com",
+    "functional.events.data.microsoft.com",
+    "browser.events.data.msn.com",
+    "self.events.data.microsoft.com",
+    "v10.events.data.microsoft.com",
+    "v10c.events.data.microsoft.com",
+    "us-v10c.events.data.microsoft.com",
+    "eu-v10c.events.data.microsoft.com",
+    "v10.vortex-win.data.microsoft.com",
+    "vortex-win.data.microsoft.com",
+    "telecommand.telemetry.microsoft.com",
+    "www.telecommandsvc.microsoft.com",
+    "umwatson.events.data.microsoft.com",
+    "watsonc.events.data.microsoft.com",
+    "eu-watsonc.events.data.microsoft.com",
+    "config.edge.skype.com"
+)
+
+try {
+    $hostsContent = if (Test-Path $hostsPath) { Get-Content $hostsPath -Raw } else { "" }
+    foreach ($domain in $domainsToBlock) {
+        $entry = "0.0.0.0`t$domain"
+        if ($hostsContent -notlike "*$domain*") {
+            Add-Content -Path $hostsPath -Value $entry -Encoding UTF8
+            $tweakCount++
+        }
+    }
+} catch {
+    $tweakErrors++
+}
+
+# Disable lock screen app notifications
+Write-Host "- Disabling lock screen app notifications..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" "DisableLockScreenAppNotifications" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable handwriting data sharing
+Write-Host "- Disabling handwriting data sharing..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\TabletPC" "PreventHandwritingDataSharing" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable input personalization
+Write-Host "- Disabling input personalization..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization" "AllowInputPersonalization" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" "HarvestContacts" 0) { $tweakCount++ } else { $tweakErrors++ }
+
 # Clear SRUM database
 Write-Host "- Clearing System Resource Usage Monitor data..." -ForegroundColor Cyan
 try {
