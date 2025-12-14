@@ -10,8 +10,15 @@ The Windows privacy configuration combines multiple privacy frameworks:
 - **privacy.sexy** (v0.13.8) - Comprehensive privacy tweaks
 - **O&O ShutUp10++** (v2.1.1015) - Advanced privacy and app permission controls
 
-### Execution Order (Recommended)
+### Execution Methods
 
+**Option A: Interactive Menu (Recommended)**
+```powershell
+# Run master installer with interactive menu
+iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/install.ps1'))
+```
+
+**Option B: Individual Scripts**
 1. **windows_install.ps1** - Install essential packages (required)
 2. **privacy_tweaks.ps1** - Apply privacy and telemetry settings (optional, ~5-10 min runtime)
 3. **vscode_extensions.ps1** - Install VS Code extensions (optional)
@@ -29,7 +36,24 @@ The Windows privacy configuration combines multiple privacy frameworks:
 
 ## Quick Reference: Running the Scripts
 
-### One-by-One (Recommended for First Run)
+### Interactive Menu (Easiest)
+```powershell
+# Run from web (requires internet)
+iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/install.ps1'))
+
+# Or run locally
+powershell.exe -ExecutionPolicy Bypass -File ".\win\install.ps1"
+```
+
+**Menu Options:**
+- `1` - Windows Package Installation (Essential + Optional packages)
+- `2` - Privacy & Security Tweaks (80+ modifications)
+- `3` - VS Code Extensions
+- `4` - Development Environment Setup (WSL2, Docker, Node, Python, Git, AWS)
+- `5` - All of the above (complete setup)
+- `q` - Quit
+
+### Individual Scripts (Advanced)
 ```powershell
 # 1. Install packages (essential, GPU detection included)
 powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1"
@@ -44,9 +68,9 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\vscode_extensions.ps1"
 powershell.exe -ExecutionPolicy Bypass -File ".\win\dev_setup.ps1"
 ```
 
-### All at Once (For Automation)
+### Automated Installation (For CI/CD)
 ```powershell
-# Run all scripts sequentially
+# Run all scripts sequentially without prompts
 @("windows_install.ps1", "privacy_tweaks.ps1", "vscode_extensions.ps1", "dev_setup.ps1") | 
   ForEach-Object { powershell.exe -ExecutionPolicy Bypass -File ".\win\$_" }
 ```
@@ -63,6 +87,82 @@ if (-not $isAdmin) { Write-Host "ERROR: Please run as Administrator" -Foreground
 # Check Internet connectivity
 Test-Connection 8.8.8.8 -Count 1
 ```
+
+---
+
+## Section 0: install.ps1 (Master Installer)
+
+**Purpose:** Interactive menu-driven installer that orchestrates all setup scripts with user choice.
+
+**File Size:** ~200 lines
+
+**Features:**
+- Interactive menu with numbered options
+- Clear descriptions of each installation component
+- Administrator privilege checking
+- Sequential script execution based on user selection
+- Option to run all scripts at once
+- Progress tracking and status messages
+- Error handling for failed installations
+- Graceful exit on user cancellation
+
+**Menu Options:**
+1. **Windows Package Installation** - Runs `windows_install.ps1`
+   - 74 packages (Essential + Optional)
+   - GPU detection and driver installation
+   - ~30-60 minutes depending on selections
+
+2. **Privacy & Security Tweaks** - Runs `privacy_tweaks.ps1`
+   - 80+ registry modifications
+   - App permission controls
+   - Hosts file domain blocking
+   - ~5-10 minutes
+
+3. **VS Code Extensions** - Runs `vscode_extensions.ps1`
+   - Productivity and development extensions
+   - ~5 minutes
+
+4. **Development Environment** - Runs `dev_setup.ps1`
+   - WSL2, Docker, Node.js, Python, Git, AWS CLI
+   - ~15-30 minutes
+
+5. **All of the Above** - Runs all scripts sequentially
+   - Complete system setup
+   - ~60-120 minutes total
+
+**Requirements:**
+- Administrator privileges
+- Windows 10/11
+- Internet connection
+- PowerShell 5.1 or later
+
+**Execution:**
+```powershell
+# From web (one-liner)
+iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/install.ps1'))
+
+# From local file
+powershell.exe -ExecutionPolicy Bypass -File ".\win\install.ps1"
+
+# Or in current session
+.\win\install.ps1
+```
+
+**Output:**
+- Interactive menu display
+- Selection confirmation
+- Real-time script execution status
+- Success/failure summary for each component
+- Completion notification with next steps
+
+**Error Handling:**
+- Validates administrator privileges before execution
+- Checks for script file existence (local mode)
+- Graceful handling of user cancellation (Ctrl+C)
+- Individual script failures don't stop subsequent selections
+
+**Author Credit:**
+All scripts written by **@mrfixit027**
 
 ---
 
@@ -361,11 +461,16 @@ pc-setup/
 │   ├── mac_install.sh
 │   └── vscode.sh
 └── win/                 # Windows setup scripts
-    ├── windows_install.ps1
-    ├── privacy_tweaks.ps1
-    ├── vscode_extensions.ps1
-    └── dev_setup.ps1
+    ├── install.ps1            # ⭐ Master installer (interactive menu)
+    ├── windows_install.ps1    # Package installation via Chocolatey
+    ├── privacy_tweaks.ps1     # Privacy & security hardening
+    ├── vscode_extensions.ps1  # VS Code extension installer
+    ├── dev_setup.ps1          # Development environment setup
+    ├── ooshutup10.cfg         # O&O ShutUp10++ configuration reference
+    └── privacy.bat            # privacy.sexy batch file reference
 ```
+
+**Author:** All scripts written by **@mrfixit027**
 
 ---
 
