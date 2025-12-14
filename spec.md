@@ -1,10 +1,17 @@
 # PC Setup Scripts Specification
 
+**Author:** @mrfixit027  
+**GitHub:** https://github.com/peeweeh/pc-setup
+
+---
+
 This document describes the purpose, functionality, and relationships between all setup scripts in this repository.
 
 ## Overview
 
 The PC Setup project provides modular, automated setup scripts for Windows and macOS. Each script has a specific purpose to ensure separation of concerns and allow users to pick and choose which setup components to apply.
+
+**All scripts written by @mrfixit027** - Each script displays attribution and GitHub URL at runtime.
 
 The Windows privacy configuration combines multiple privacy frameworks:
 - **privacy.sexy** (v0.13.8) - Comprehensive privacy tweaks
@@ -161,8 +168,10 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\install.ps1"
 - Graceful handling of user cancellation (Ctrl+C)
 - Individual script failures don't stop subsequent selections
 
-**Author Credit:**
-All scripts written by **@mrfixit027**
+**Runtime Attribution:**
+- All scripts display "By @mrfixit027" at start
+- GitHub URL displayed: https://github.com/peeweeh/pc-setup
+- Attribution shown at completion
 
 ---
 
@@ -461,16 +470,19 @@ pc-setup/
 │   ├── mac_install.sh
 │   └── vscode.sh
 └── win/                 # Windows setup scripts
-    ├── install.ps1            # ⭐ Master installer (interactive menu)
-    ├── windows_install.ps1    # Package installation via Chocolatey
-    ├── privacy_tweaks.ps1     # Privacy & security hardening
-    ├── vscode_extensions.ps1  # VS Code extension installer
-    ├── dev_setup.ps1          # Development environment setup
+    ├── install.ps1            # ⭐ Master installer (interactive menu) by @mrfixit027
+    ├── windows_install.ps1    # Package installation via Chocolatey by @mrfixit027
+    ├── privacy_tweaks.ps1     # Privacy & security hardening by @mrfixit027
+    ├── vscode_extensions.ps1  # VS Code extension installer by @mrfixit027
+    ├── dev_setup.ps1          # Development environment setup by @mrfixit027
     ├── ooshutup10.cfg         # O&O ShutUp10++ configuration reference
     └── privacy.bat            # privacy.sexy batch file reference
 ```
 
-**Author:** All scripts written by **@mrfixit027**
+**Author:** All scripts written by **@mrfixit027**  
+**GitHub:** https://github.com/peeweeh/pc-setup
+
+**Runtime Display:** Each script shows attribution and GitHub URL when executed.
 
 ---
 
