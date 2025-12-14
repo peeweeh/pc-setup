@@ -117,9 +117,16 @@ while true; do
             echo -ne "${YELLOW}Are you sure you want to continue? [y/N]: ${NC}"
             read -r confirm
             if [[ $confirm =~ ^[Yy]$ ]]; then
-                print_info "Downloading and executing privacy.sh..."
-                print_warning "This script requires sudo privileges..."
-                bash <(curl -fsSL ${GITHUB_RAW}/privacy.sh)
+                print_info "Downloading privacy.sh..."
+                TEMP_PRIVACY=$(mktemp /tmp/privacy.sh.XXXXXX)
+                if curl -fsSL ${GITHUB_RAW}/privacy.sh -o "$TEMP_PRIVACY"; then
+                    chmod +x "$TEMP_PRIVACY"
+                    print_info "Running privacy.sh (will prompt for sudo password)..."
+                    "$TEMP_PRIVACY" || print_error "privacy.sh failed"
+                    rm -f "$TEMP_PRIVACY"
+                else
+                    print_error "Failed to download privacy.sh"
+                fi
             else
                 print_info "Skipped privacy.sh"
             fi
@@ -166,10 +173,16 @@ while true; do
             echo -ne "${YELLOW}Run privacy.sh (advanced privacy hardening)? [y/N]: ${NC}"
             read -r privacy_confirm
             if [[ $privacy_confirm =~ ^[Yy]$ ]]; then
-                print_info "Running privacy.sh..."
-                bash <(curl -fsSL ${GITHUB_RAW}/privacy.sh) || {
-                    print_error "privacy.sh failed."
-                }
+                print_info "Downloading privacy.sh..."
+                TEMP_PRIVACY=$(mktemp /tmp/privacy.sh.XXXXXX)
+                if curl -fsSL ${GITHUB_RAW}/privacy.sh -o "$TEMP_PRIVACY"; then
+                    chmod +x "$TEMP_PRIVACY"
+                    print_info "Running privacy.sh (will prompt for sudo password)..."
+                    "$TEMP_PRIVACY" || print_error "privacy.sh failed"
+                    rm -f "$TEMP_PRIVACY"
+                else
+                    print_error "Failed to download privacy.sh"
+                fi
             else
                 print_info "Skipped privacy.sh"
             fi
