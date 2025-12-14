@@ -86,23 +86,29 @@ Installs Visual Studio Code extensions
 
 ### Windows
 
-1. **Download the script**:
+**Recommended: One-liner for fresh PC** (run as Administrator):
+
+1. **Right-click PowerShell** and select **"Run as Administrator"**
+2. **Copy and paste this command**:
    ```powershell
-   # Clone the repository
-   git clone https://github.com/peeweeh/pc-setup.git
-   cd pc-setup/win
+   Set-ExecutionPolicy Bypass -Scope Process -Force; iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/windows_install.ps1 | iex
    ```
 
-2. **Run as Administrator**:
-   ```powershell
-   # Right-click PowerShell and select "Run as Administrator"
-   .\windows_install.ps1
-   ```
+That's it! The script will:
+- Install Chocolatey (if not present)
+- Detect your GPU and install drivers (NVIDIA only)
+- Install all packages
+- Apply privacy tweaks
+- Configure Oh My Posh
+- Install PowerShell modules
+- Launch O&O ShutUp10++
 
-3. **One-liner (run as Administrator)**:
-   ```powershell
-   Set-ExecutionPolicy Bypass -Scope Process -Force; iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/main/win/windows_install.ps1 | iex
-   ```
+**Alternative: Manual download** (if you have git):
+```powershell
+git clone https://github.com/peeweeh/pc-setup.git
+cd pc-setup/win
+.\windows_install.ps1
+```
 
 ### macOS
 
