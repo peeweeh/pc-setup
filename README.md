@@ -16,36 +16,188 @@ Automated setup scripts for Windows and macOS to quickly configure a new develop
 ## ✨ Features
 
 ### Windows
+- **Interactive Installer** - Menu-driven setup with 5 options (Apps, Dev Setup, VS Code, Privacy, All)
 - **Automated Package Installation** via Chocolatey (74+ packages)
-- **GPU Detection** - Automatically installs NVIDIA drivers for NVIDIA GPUs
-- **Privacy & Performance Tweaks** - Disables telemetry, location tracking, and unnecessary services
-- **Shell Customization** - Oh My Posh with Nerd Fonts
+- **GPU Detection & Drivers** - Automatically detects and installs NVIDIA/AMD drivers
+- **Development Environment Setup** - WSL2, Docker, Node.js, Python, AWS CLI, Git
+- **Privacy & Performance Tweaks** - Comprehensive telemetry disabling (471 lines)
+- **Disables Cortana, GameDVR, Telemetry** - Reclaims system resources
+- **Oh My Posh Configuration** - Beautiful PowerShell prompt with Nerd Fonts
 - **PowerShell Enhancement** - PSReadLine and Terminal-Icons modules
-- **Privacy Tool** - O&O ShutUp10++ for additional privacy configuration
-- **System Restore Point** - Created before applying tweaks
+- **System Restore Point** - Created before applying tweaks for safety
 
 ### macOS
-- **Homebrew Package Installation** - Essential development tools and applications
-- **System Customization** - Dock, Finder, and Terminal configuration
-- **Theme Installation** - Nord Terminal theme
-- **Shell Enhancement** - Powerlevel10k for Zsh
+- **Interactive Installer** - Menu-driven setup with 5 options (Apps, Optimize, VS Code, Privacy, All)
+- **Homebrew Package Installation** - 40+ essential applications and 20+ CLI tools
+- **System Optimization** - Performance, battery, and UI speed improvements
+- **Disables Siri, Photos AI, Media AI** - Significant battery savings
+- **Privacy Hardening** - Comprehensive 831-line privacy configuration
+- **Shell Enhancement** - Powerlevel10k for Zsh, plugins, aliases
+- **Dock & Finder Customization** - Auto-hide, speed improvements, clean layout
+- **Terminal Theme** - Nord color scheme for beautiful terminal
 
 ## 🪟 Windows Setup
 
-### Scripts
+**Author**: [@mrfixit027](https://github.com/mrfixit027)
 
-#### `windows_install.ps1`
-Comprehensive setup script that includes:
-1. Chocolatey installation
-2. GPU detection and driver installation (NVIDIA only)
-3. Application installation (74 packages)
-4. Windows privacy and performance tweaks
-5. Oh My Posh configuration with Nerd Fonts
-6. PowerShell module installation (PSReadLine, Terminal-Icons)
-7. O&O ShutUp10++ download and launch
+### 🚀 Interactive Installer (Recommended)
 
-#### `vscode_extensions.ps1`
-Installs Visual Studio Code extensions
+**Run this command in PowerShell as Administrator**:
+
+```powershell
+powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/install.ps1 | iex"
+```
+
+Or run locally:
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force
+& ".\win\install.ps1"
+```
+
+The installer presents a colored menu where you can choose which components to install:
+
+```
+========================================
+     PC Setup - Master Installer
+========================================
+Choose an option:
+
+1) 📦 Install Applications (windows_install.ps1)
+2) 🔧 Development Setup (dev_setup.ps1)
+3) 🎨 Install VS Code Extensions (vscode_extensions.ps1)
+4) 🔒 Privacy Tweaks (privacy_tweaks.ps1)
+5) 🚀 Install ALL (recommended for fresh Windows)
+
+q) ❌ Quit
+```
+
+**Choose from:**
+- **Option 1** - Install 74+ applications via Chocolatey
+- **Option 2** - Setup development environment (WSL2, Docker, Node, Python, AWS)
+- **Option 3** - Install 50+ VS Code extensions
+- **Option 4** - Privacy hardening (telemetry, Cortana, feedback)
+- **Option 5** - Run all scripts in sequence (best for fresh Windows)
+
+### Scripts Overview
+
+#### `install.ps1` (Interactive Menu)
+Master installer with menu-driven setup orchestration:
+- Beautiful colored menu interface with emoji status
+- Select individual scripts or run all
+- Proper error handling and progress tracking
+- Automatically handles PowerShell execution policy
+- Downloads scripts from GitHub on-the-fly (no manual cloning required)
+
+#### `windows_install.ps1` (74+ Applications)
+Comprehensive Windows setup script with:
+- **Automatic Chocolatey installation** if not present
+- **GPU detection** - Detects NVIDIA/AMD and installs appropriate drivers
+  - NVIDIA: Installs nvidia-app and nvidia-physx
+  - AMD: Prompts user to download drivers manually
+- **System restore point** created before applying tweaks
+- **74+ applications** organized by category:
+  - **Productivity**: 1Password, PowerToys, 7-Zip, WinRAR, Sysinternals, Everything, TreeSizeFree
+  - **Browsers**: Chrome, Edge, Brave, Arc
+  - **Development**: Git, VS Code, Node.js, Python, Postman, DevToys, Neovim
+  - **CLI Tools**: fzf, bat, ripgrep, fd, jq, git-delta, zoxide, curl, ffmpeg
+  - **Communication**: Slack, Teams, Discord, Signal, Telegram, WhatsApp, Beeper, Amazon Chime
+  - **Media**: VLC, Plex Media Player
+  - **Gaming**: Steam, Epic Games, EA App, GOG Galaxy, Ubisoft Connect
+  - **Cloud Storage**: Google Drive, iCloud, Proton Drive
+  - **System Monitoring**: HWiNFO, MSI Afterburner, RivaTuner
+  - **Security**: Proton VPN, Proton Mail
+  - **Graphics**: GPU detection and driver installation
+- **Windows Privacy & Performance Tweaks**:
+  - Disables telemetry and diagnostic data collection
+  - Disables location tracking and Wi-Fi Sense
+  - Disables consumer features and app suggestions
+  - Disables GameDVR and Xbox features
+  - Disables cortana and feedback collection
+  - Enables "End Task" right-click on taskbar
+  - Runs disk cleanup
+  - Disables hibernation (saves SSD space)
+  - Disables storage sense optimization
+- **Oh My Posh Configuration**:
+  - Installs Oh My Posh with atomic theme
+  - Installs Nerd Fonts (FiraMono, FiraCode)
+  - Creates/backs up PowerShell profile
+- **PowerShell Modules**:
+  - PSReadLine (enhanced command-line editing)
+  - Terminal-Icons (file/folder icons in directory listings)
+
+**Runtime**: 20-60 minutes depending on internet speed
+
+#### `dev_setup.ps1` (Development Environment)
+Development environment setup with:
+- **WSL2 (Windows Subsystem for Linux) Installation**
+  - Installs WSL with Ubuntu
+  - Configures WSL resources and networking
+- **Docker Desktop Setup**
+  - Installs Docker Desktop via Chocolatey
+  - Enables Docker integration with WSL2
+- **Development Tools**:
+  - Node.js and npm package manager
+  - Python with pip and common packages (requests, flask, numpy, pandas)
+  - Git configuration (user.name, user.email, core.editor)
+- **AWS Configuration**
+  - AWS CLI installation and configuration
+  - AWS credentials setup with interactive prompts
+- **Version Control**:
+  - Git configuration
+  - GitHub CLI (gh) setup
+  - SSH key generation for GitHub
+- **Language SDKs**:
+  - Go installation and path setup
+  - Rust installation (via rustup)
+  - Java JDK installation
+
+**Runtime**: 30-45 minutes
+
+#### `privacy_tweaks.ps1` (Advanced Privacy)
+Comprehensive Windows privacy hardening (471 lines):
+- **Disables telemetry**: Diagnostic data, feedback collection, activity history
+- **Removes tracking**: Location services, Wi-Fi Sense, cloud-based speech recognition
+- **Disables spyware**: Cortana, Siri integration, consumer features
+- **Privacy policies**: Opts out of Windows privacy consent, personalization
+- **App diagnostics**: Disables app data collection
+- **Input privacy**: Disables text/handwriting data collection
+- **Start menu**: Removes app suggestions and tiles
+- **Network privacy**: Disables network suggestions
+- **General privacy**: Removes default user accounts, minimizes DISM data
+
+**Runtime**: 3-5 minutes
+
+#### `vscode_extensions.ps1` (50+ Extensions)
+Installs 50+ professionally-selected VS Code extensions:
+
+**AI & Productivity**:
+- GitHub Copilot, Amazon Q, Claude, Continue, DS Code GPT
+
+**Themes & Icons**:
+- Nord, Dracula, One Dark Pro, Material Theme, vscode-icons
+
+**AWS & Cloud**:
+- AWS Toolkit, Terraform, CloudFormation, Kubernetes
+
+**Code Quality**:
+- ESLint, Prettier, CodeSnap, Turbo Console Log, Better Comments
+
+**Git & Version Control**:
+- GitLens, Git History, Atlassian
+
+**Languages**:
+- Python (Autopep8, isort, Pylance), Go, GraphQL, JavaScript, TypeScript
+
+**DevOps & Infrastructure**:
+- Docker, Kubernetes, AWS Toolkit, Terraform, Remote Containers, GitHub Actions
+
+**Data & Analysis**:
+- Jupyter, Python, Pandas extensions, REST Client, Thunder Client
+
+**Utilities**:
+- Edge DevTools, PowerShell, Live Share, YAML, Markdown, Excel Viewer
+
+**Runtime**: 10-15 minutes
 
 ## 🍎 macOS Setup
 
@@ -248,125 +400,198 @@ Comprehensive privacy and security hardening (831 lines):
 
 ### Windows
 
-**Recommended: One-liner for fresh PC** (run as Administrator):
+**Recommended: Interactive Installer** (run as Administrator):
 
 1. **Right-click PowerShell** and select **"Run as Administrator"**
 2. **Copy and paste this command**:
    ```powershell
-   Set-ExecutionPolicy Bypass -Scope Process -Force; iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/windows_install.ps1 | iex
+   powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/install.ps1 | iex"
    ```
 
-That's it! The script will:
-- Install Chocolatey (if not present)
-- Detect your GPU and install drivers (NVIDIA only)
-- Install all packages
-- Apply privacy tweaks
-- Configure Oh My Posh
-- Install PowerShell modules
-- Launch O&O ShutUp10++
+The installer will show a menu where you can choose:
+- **Option 1**: Install Applications (windows_install.ps1)
+- **Option 2**: Setup Development Environment (dev_setup.ps1)
+- **Option 3**: Install VS Code Extensions (vscode_extensions.ps1)
+- **Option 4**: Privacy Hardening (privacy_tweaks.ps1)
+- **Option 5**: Install ALL (recommended for fresh Windows)
 
-**Alternative: Manual download** (if you have git):
+**Just windows_install.ps1:**
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/windows_install.ps1 | iex
+```
+
+The script will:
+- Install Chocolatey (if not present)
+- Detect your GPU and install drivers (NVIDIA auto-detected, AMD manual)
+- Install 74+ applications via Chocolatey
+- Apply Windows privacy & performance tweaks
+- Configure Oh My Posh with Nerd Fonts
+- Install PowerShell modules (PSReadLine, Terminal-Icons)
+- Create system restore point for safety
+
+**Alternative: Run locally from cloned repo**:
 ```powershell
 git clone https://github.com/peeweeh/pc-setup.git
 cd pc-setup/win
-.\windows_install.ps1
+Set-ExecutionPolicy Bypass -Scope Process -Force
+& ".\install.ps1"
 ```
 
 ### macOS
 
-1. **Download the scripts**:
-   ```bash
-   # Clone the repository
-   git clone https://github.com/peeweeh/pc-setup.git
-   cd pc-setup/mac
-   ```
+**Recommended: Interactive Installer**:
 
-2. **Make scripts executable**:
-   ```bash
-   chmod +x brew_install.sh mac_install.sh vscode.sh
-   ```
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
+```
 
-3. **Run the scripts**:
-   ```bash
-   # Install applications
-   ./brew_install.sh
-   
-   # Customize system settings
-   ./mac_install.sh
-   
-   # Install VS Code extensions (optional)
-   ./vscode.sh
-   ```
+The installer will show a menu where you can choose:
+- **Option 1**: Install Applications (brew_install.sh)
+- **Option 2**: Optimize System (mac_install.sh)
+- **Option 3**: Install VS Code Extensions (vscode.sh)
+- **Option 4**: Privacy Hardening (privacy.sh)
+- **Option 5**: Install ALL (recommended for fresh Mac)
+
+**Alternative: Run locally from cloned repo**:
+```bash
+git clone https://github.com/peeweeh/pc-setup.git
+cd pc-setup/mac
+chmod +x *.sh
+./install.sh
+```
 
 ## 📦 What Gets Installed
 
-### Windows Applications (via Chocolatey)
+### Windows Applications (74+ via Chocolatey)
 
-#### Productivity & Utilities
-- 1Password, 7-Zip, WinRAR
-- PowerToys, Sysinternals
-- Everything, TreeSizeFree, WizTree
-- Chocolatey GUI, Boxstarter
+#### Productivity & System Tools
+- 1Password (password manager)
+- PowerToys (Windows productivity utilities)
+- Sysinternals (system administration tools)
+- Everything (instant file search)
+- TreeSizeFree (disk space analyzer)
+- WizTree (fast disk space visualization)
+- Chocolatey GUI (package manager GUI)
+- 7-Zip, WinRAR (compression utilities)
 
 #### Browsers
-- Google Chrome, Microsoft Edge, Brave, Arc Browser
+- Google Chrome
+- Microsoft Edge
+- Brave Browser
+- Arc Browser
 
-#### Development Tools
-- Git, GitHub Desktop, Visual Studio Code
-- Node.js, Python 3.14
-- Neovim, LINQPad
-- Postman, Wireshark
-- Docker (manual installation recommended)
+#### Development & Programming
+- Git, GitHub Desktop (version control)
+- Visual Studio Code (IDE)
+- Node.js, npm (JavaScript/TypeScript)
+- Python (Python runtime)
+- Go (Go programming language)
+- Postman (API testing)
+- Neovim (terminal editor)
+- LINQPad (C# scripting)
+- Fig (CLI autocompletion)
+- DevToys (developer utilities)
+- FFmpeg (video processing)
 
-#### CLI Productivity Tools
-- fzf (fuzzy finder)
+#### CLI Tools & Utilities
 - bat (cat with syntax highlighting)
+- fzf (fuzzy finder)
 - ripgrep (fast grep)
 - fd (fast find)
-- zoxide (smart cd)
-- git-delta (better git diffs)
+- zoxide (smart directory navigation)
+- git-delta (enhanced git diffs)
 - jq (JSON processor)
-- less, curl
+- curl (data transfer)
+- less (pager)
 
-#### Communication
-- Slack, Microsoft Teams, Discord
-- Signal, Telegram, WhatsApp
-- Beeper App
+#### Communication & Chat
+- Slack (team messaging)
+- Microsoft Teams (enterprise chat)
+- Discord (community chat)
+- Signal (secure messaging)
+- Telegram (messaging app)
+- WhatsApp (messaging app)
+- Amazon Chime (AWS video conferencing)
+- Beeper (unified messaging)
 
 #### Media & Entertainment
-- VLC, Plex Media Player
-- Steam
-- Spotify (optional)
+- VLC (media player)
+- Plex Media Player (streaming)
+- Steam (gaming platform)
+- Spotify (music streaming)
 
-#### Gaming Platforms
-- Steam, Epic Games, EA App
-- GOG Galaxy, Ubisoft Connect
+#### Gaming & Gaming Platforms
+- Epic Games Launcher
+- EA App (Electronic Arts)
+- GOG Galaxy (DRM-free games)
+- Ubisoft Connect (Ubisoft games)
 
-#### Cloud Storage
-- Google Drive, iCloud
-- Proton Drive
+#### Cloud Storage & Backup
+- Google Drive (cloud storage)
+- iCloud (Apple cloud storage)
+- Proton Drive (encrypted storage)
 
-#### Design & Creativity
-- Calibre, Clipchamp
-
-#### System & Hardware
-- AMD Ryzen Chipset & Master (for AMD systems)
-- MSI Afterburner, RivaTuner
-- HWiNFO, HWMonitor
+#### System Monitoring & Performance
+- HWiNFO (hardware info)
 - DDU (Display Driver Uninstaller)
+- MSI Afterburner (GPU overclocking)
+- RivaTuner (GPU monitoring)
+
+#### Graphics & Design
+- Calibre (ebook management)
+- Clipchamp (video editor)
 
 #### Security & Privacy
-- Proton VPN, Proton Mail
-- O&O ShutUp10++
+- Proton VPN (virtual private network)
+- Proton Mail (encrypted email)
 
-#### Shell Customization
-- Oh My Posh
-- Starship (alternative prompt)
-- Nerd Fonts (FiraMono, FiraCode)
+#### Shell & Terminal Customization
+- Oh My Posh (PowerShell prompt theming)
+- Nerd Fonts (FiraMono, FiraCode with icons)
+
+#### Development Environment (dev_setup.ps1)
+- WSL2 (Windows Subsystem for Linux)
+- Docker Desktop (containerization)
+- AWS CLI (Amazon Web Services CLI)
+- GitHub CLI (gh command)
+- Rust (Rust programming language)
+- Java JDK (Java development)
 
 #### PowerShell Modules
 - PSReadLine (enhanced command-line editing)
-- Terminal-Icons (file icons in directory listings)
+- Terminal-Icons (file/folder icons in listings)
+
+### Windows VS Code Extensions (50+)
+
+**AI & Productivity**: GitHub Copilot, Amazon Q, Claude, Continue, DS Code GPT
+
+**Themes & Icons**: Nord, Dracula, One Dark Pro, Material Theme, vscode-icons
+
+**Languages**: Python (Autopep8, isort, Pylance), Go, GraphQL, JavaScript, TypeScript, Rust, C++, SQL
+
+**Development Tools**: ESLint, Prettier, CodeSnap, Turbo Console Log, Better Comments
+
+**Git & Version Control**: GitLens, Git History, Atlassian (Jira/Bitbucket)
+
+**DevOps & Infrastructure**: Docker, Kubernetes, AWS Toolkit, Terraform, Remote Containers, GitHub Actions
+
+**Data & Analysis**: Jupyter, Python, REST Client, Thunder Client
+
+**Utilities**: Edge DevTools, PowerShell, Live Share, YAML, Markdown, Excel Viewer, File Downloader
+
+### Windows Privacy & Telemetry Disabled (privacy_tweaks.ps1)
+- Disables diagnostic data collection
+- Removes Cortana and Cortana search
+- Disables location tracking
+- Disables activity history
+- Disables cloud-based speech recognition
+- Removes consumer features and app suggestions
+- Disables text and handwriting data collection
+- Opts out of Windows feedback
+- Removes default user accounts
+- Disables various telemetry services
+- Disables consumer feature recommendations
+- Opt-out of privacy consent and personalization
 
 ### macOS Applications (via Homebrew)
 
@@ -433,34 +658,41 @@ notepad $PROFILE
 
 ## 🔒 Privacy & Security
 
-### Windows Tweaks Applied
-- Disables Windows telemetry
-- Disables activity history
-- Disables location tracking
-- Disables Wi-Fi Sense
-- Disables consumer features
-- Disables GameDVR
-- Disables storage sense
-- Disables PowerShell 7 telemetry
-- Creates system restore point before changes
+### Windows Privacy (privacy_tweaks.ps1)
+Comprehensive privacy hardening with 471 lines of registry tweaks:
+- **Disables telemetry** - Diagnostic data, feedback collection, activity history
+- **Removes tracking** - Location services, Wi-Fi Sense, cloud-based speech recognition
+- **Disables spyware** - Cortana, consumer features, app suggestions
+- **Opts out** - Windows privacy consent, personalization, content delivery
+- **Input privacy** - Disables text and handwriting data collection
+- **Network privacy** - Removes network suggestions and defaults
+- **General privacy** - Removes default user accounts, minimizes DISM data
+- **Creates restore point** - Allows reverting changes if needed
 
-### Additional Privacy
-- O&O ShutUp10++ is downloaded and launched for manual privacy configuration
-- All tweaks can be reviewed before running the script
+### macOS Privacy (privacy.sh)
+Advanced privacy hardening with 831 lines from privacy.sexy framework:
+- **Disables Siri completely** - Removes all Siri services and data collection
+- **Blocks telemetry** - Firefox, Office, Homebrew, .NET, PowerShell
+- **Security hardening** - Firewall, removes guest user, disables remote access
+- **Clears data** - System caches, CUPS, Xcode, DNS, trash
 
 ## ⚠️ Important Notes
 
 ### Windows
-- **Requires Administrator privileges**
-- Some installations may require system restart
-- AMD GPU drivers are NOT installed automatically (download from AMD website)
-- O&O ShutUp10++ launches at the end - configure privacy settings manually
-- Review the privacy tweaks before running if you have concerns
+- **Requires Administrator privileges** - Run PowerShell as Administrator
+- **System restore point created** - Safe to revert if issues occur
+- **GPU drivers**: NVIDIA auto-detected, AMD requires manual download
+- **Restart recommended** - Some features require reboot to take effect
+- **dev_setup.ps1 is optional** - Only needed for development environment
+- **privacy_tweaks.ps1 can be reviewed** - Edit registry keys before running if desired
+- **WSL2 requires Hyper-V** - Check BIOS for virtualization support
 
 ### macOS
-- Homebrew will be installed if not present
-- Some system changes may require logout/restart
-- Xcode Command Line Tools will be installed automatically
+- **Homebrew installs automatically** if not present
+- **Xcode Command Line Tools** installed automatically by Homebrew
+- **System restart recommended** - For full effect of system tweaks
+- **Some settings require logout** - Especially shell configuration changes
+- **privacy.sh is advanced** - Review before running on critical systems
 
 ## 🤝 Contributing
 
@@ -480,13 +712,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Chocolatey](https://chocolatey.org/) - Package manager for Windows
 - [Homebrew](https://brew.sh/) - Package manager for macOS
-- [Oh My Posh](https://ohmyposh.dev/) - Prompt theme engine
-- [Chris Titus Tech](https://christitus.com/) - Windows utility inspiration
-- [O&O Software](https://www.oo-software.com/en/shutup10) - ShutUp10++ privacy tool
+- [Oh My Posh](https://ohmyposh.dev/) - PowerShell prompt theming
+- [Powerlevel10k](https://github.com/romkatv/powerlevel10k) - Zsh prompt theme
+- [privacy.sexy](https://privacy.sexy/) - Privacy configuration framework
+- [@mrfixit027](https://github.com/mrfixit027) - Script author and maintainer
 
 ## 📞 Support
 
 If you encounter any issues or have questions:
 1. Check existing [Issues](https://github.com/peeweeh/pc-setup/issues)
-2. Create a new issue with detailed information
-3. Include your OS version and error messages
+2. Create a new issue with detailed information and error messages
+3. Include your OS version (Windows 10/11, macOS version)
+4. Specify which script caused the issue
