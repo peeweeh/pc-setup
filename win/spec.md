@@ -77,12 +77,7 @@ Registry modifications and system changes:
 - **Terminal-Icons**: File/folder icons in directory listings
 - Installs from PowerShell Gallery with `-Scope CurrentUser`
 
-### 1.7 O&O ShutUp10++
-- Downloads OOSU10.exe to `%TEMP%`
-- Launches the application (non-blocking)
-- User can configure additional privacy settings manually
-
-### 1.8 Final Summary
+### 1.7 Final Summary
 - Displays success/failure counts
 - Reminds user to restart computer
 - Provides link to Chris Titus Tech Windows Utility (optional)
@@ -97,7 +92,6 @@ Registry modifications and system changes:
 
 **Post-Script Actions**:
 - Restart computer for changes to take effect
-- Configure O&O ShutUp10++ privacy settings
 - Reload PowerShell profile or restart terminal
 
 ---
@@ -172,7 +166,7 @@ Registry modifications and system changes:
 
 **Expected Runtime**: 2-5 minutes
 
-**Reversibility**: Most changes can be reversed by running O&O ShutUp10++ or using System Restore point
+**Reversibility**: Most changes can be reversed using System Restore point or by manually reverting registry keys
 
 **Post-Script Actions**:
 - Restart computer for service changes to take effect

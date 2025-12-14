@@ -13,9 +13,9 @@ The PC Setup project provides modular, automated setup scripts for Windows and m
 
 **All scripts written by @mrfixit027** - Each script displays attribution and GitHub URL at runtime.
 
-The Windows privacy configuration combines multiple privacy frameworks:
-- **privacy.sexy** (v0.13.8) - Comprehensive privacy tweaks
-- **O&O ShutUp10++** (v2.1.1015) - Advanced privacy and app permission controls
+The Windows privacy configuration is based on:
+- **privacy.sexy** (v0.13.8) - Comprehensive privacy tweaks and telemetry blocking
+- Additional app permission controls and security hardening
 
 ### Execution Methods
 
@@ -33,11 +33,11 @@ iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercon
 
 ### Key Statistics
 
-- **Total Windows Setup Scripts:** 4 PowerShell scripts + 1 configuration file
+- **Total Windows Setup Scripts:** 5 PowerShell scripts
 - **Privacy/Telemetry Coverage:** ~78% of major Windows privacy settings
 - **Registry Modifications:** 80+ registry keys across HKCU and HKLM hives
 - **Packages Available:** 74 via Chocolatey (18 Essential, 56+ Optional, GPU-specific)
-- **Total Implementation Lines:** 1,100+ lines of PowerShell code
+- **Total Implementation Lines:** 1,600+ lines of PowerShell code
 
 ---
 
@@ -239,13 +239,14 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1"
 
 ## Section 2: privacy_tweaks.ps1
 
-**Purpose:** Comprehensive privacy, telemetry, and security hardening configuration combining privacy.sexy and O&O ShutUp10++ frameworks.
+**Purpose:** Comprehensive privacy, telemetry, and security hardening configuration based on privacy.sexy with additional app permission controls.
 
 **File Size:** 453 lines
 
-**Framework Sources:**
+**Framework Source:**
 - **privacy.sexy** (v0.13.8) - Community-driven privacy framework
-- **O&O ShutUp10++** (v2.1.1015) - Professional privacy configuration tool
+- Additional app permission controls via Windows CapabilityAccessManager
+- Advanced security hardening (SEHOP, PowerShell 2.0 disable, LAN hash blocking)
 
 **Execution Time:** ~5-10 minutes (depending on system state)
 
@@ -429,12 +430,12 @@ All privacy and telemetry settings have been consolidated into a single `privacy
 - **Single Source of Truth** - All privacy settings in one script
 - **Avoid Duplication** - No overlapping tweaks between scripts
 - **User Choice** - Apply privacy independently from packages
-- **Maintainability** - Framework-based (privacy.sexy + O&O) with clear references
+- **Maintainability** - Framework-based (privacy.sexy) with clear references
 - **Flexibility** - Users can skip any script without affecting others
 
-**Framework Combination Rationale:**
+**Privacy Configuration Approach:**
 - **privacy.sexy** provides foundational telemetry and core privacy settings
-- **O&O ShutUp10++** adds granular app permission controls and advanced security
+- Additional app permission controls integrated directly into privacy_tweaks.ps1
 - Combined coverage reaches ~78% of Windows privacy configurations
 
 ### What Was Removed
@@ -474,9 +475,7 @@ pc-setup/
     ├── windows_install.ps1    # Package installation via Chocolatey by @mrfixit027
     ├── privacy_tweaks.ps1     # Privacy & security hardening by @mrfixit027
     ├── vscode_extensions.ps1  # VS Code extension installer by @mrfixit027
-    ├── dev_setup.ps1          # Development environment setup by @mrfixit027
-    ├── ooshutup10.cfg         # O&O ShutUp10++ configuration reference
-    └── privacy.bat            # privacy.sexy batch file reference
+    └── dev_setup.ps1          # Development environment setup by @mrfixit027
 ```
 
 **Author:** All scripts written by **@mrfixit027**  
@@ -517,7 +516,6 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser -Force
 
 **Privacy & Telemetry Frameworks:**
 - [privacy.sexy](https://privacy.sexy) - Community-driven Windows privacy configuration (v0.13.8 used)
-- [O&O ShutUp10++](https://www.oo-software.com/shutup10) - Professional privacy tool (v2.1.1015 config used)
 
 **Development Tools & Package Managers:**
 - [Chocolatey Package Manager](https://chocolatey.org) - Windows package manager
