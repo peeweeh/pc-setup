@@ -55,10 +55,10 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1"
 
 ## Section 2: privacy_tweaks.ps1
 
-**Purpose:** Comprehensive privacy and telemetry configuration extracted from privacy.sexy framework.
+**Purpose:** Comprehensive privacy and telemetry configuration extracted from privacy.sexy and O&O ShutUp10++ frameworks.
 
 **Features:**
-- 60+ registry modifications for privacy and security
+- 80+ registry modifications for privacy and security
 - Service management (disables DiagTrack, dmwappushservice, WerSvc)
 - Removes telemetry and tracking:
   - Windows diagnostic data and feedback
@@ -69,6 +69,11 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1"
   - Inking and typing personalization
   - Typing feedback and input personalization
   - .NET Core and PowerShell telemetry
+- App Privacy Controls (15+ permissions):
+  - Disables app access to: account info, contacts, calendar, email, messages, documents, pictures, videos, file system
+  - Disables background app permissions
+  - Disables app diagnostics
+  - Blocks automatic app installations from Store
 - System cleanup:
   - Removes controversial `defaultuser0` account
   - Removes default app associations
@@ -79,6 +84,8 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1"
   - Disables clipboard history
   - Disables settings synchronization
   - Disables lock screen camera and app notifications
+  - Disables Windows Spotlight notifications
+  - Disables push notifications for apps
 - Security hardening:
   - Disables PowerShell 2.0 (downgrade protection)
   - Enables SEHOP (Structured Exception Handling Protection)
@@ -86,10 +93,14 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1"
   - Disables LAN Manager password hash storage
   - Disables Windows DRM internet access
   - Disables device sensors
+  - Disables password reveal button
+  - Disables Step Recorder
 - Device management:
   - Disables AutoPlay and AutoRun
   - Disables Windows Connect Now wizard
   - Disables automatic map downloads
+  - Disables Wi-Fi Sense
+  - Disables Delivery Optimization P2P
   - Blocks 30+ malicious telemetry domains in hosts file
 
 **Key Functions:**
@@ -111,7 +122,9 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\privacy_tweaks.ps1"
 **Registry Changes:**
 - **HKCU & HKLM** - Various privacy policy and data collection settings
 - **Services** - DiagTrack, dmwappushservice, WerSvc (disabled)
-- **Content Delivery Manager** - App suggestions disabled
+- **Content Delivery Manager** - App suggestions, Spotlight, silent installs disabled
+- **CapabilityAccessManager** - App permissions for contacts, calendar, email, documents, pictures, videos, file system (denied)
+- **BackgroundAccessApplications** - Background app permissions disabled
 - **Windows Search** - Cortana disabled
 - **Maps** - AutoDownloadAndUpdateMapData disabled
 - **GameDVR** - AllowGameDVR disabled
@@ -119,7 +132,8 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\privacy_tweaks.ps1"
 - **TIPC** - Typing feedback disabled
 - **Sensors** - Device sensors disabled
 - **Explorer** - NoDriveTypeAutoRun, NoAutorun, NoAutoplayfornonVolume
-- **Security** - SEHOP enabled, PowerShell 2.0 disabled, LAN hashes disabled
+- **Security** - SEHOP enabled, PowerShell 2.0 disabled, LAN hashes disabled, password reveal disabled
+- **CredUI** - Password reveal button disabled
 - **Hosts File** - 30+ telemetry domains blocked
 
 **Warnings:**

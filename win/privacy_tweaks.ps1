@@ -327,7 +327,99 @@ Write-Host "- Disabling input personalization..." -ForegroundColor Cyan
 if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization" "AllowInputPersonalization" 0) { $tweakCount++ } else { $tweakErrors++ }
 if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" "HarvestContacts" 0) { $tweakCount++ } else { $tweakErrors++ }
 
-# Clear SRUM database
+# Disable Windows Spotlight
+Write-Host "- Disabling Windows Spotlight..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "RotatingLockScreenEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "RotatingLockScreenOverlayEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app notifications
+Write-Host "- Disabling app notifications..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications" "ToastEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to account information
+Write-Host "- Disabling app access to account information..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to contact info
+Write-Host "- Disabling app access to contacts..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\contacts" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to calendar
+Write-Host "- Disabling app access to calendar..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appointments" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to call history
+Write-Host "- Disabling app access to call history..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\phoneCallHistory" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to email
+Write-Host "- Disabling app access to email..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\email" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to messaging
+Write-Host "- Disabling app access to messaging..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\chat" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to documents
+Write-Host "- Disabling app access to documents..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\documentsLibrary" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to pictures
+Write-Host "- Disabling app access to pictures..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\picturesLibrary" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to videos
+Write-Host "- Disabling app access to videos..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\videosLibrary" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to file system
+Write-Host "- Disabling app access to file system..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\broadFileSystemAccess" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to documents (system-wide)
+Write-Host "- Disabling app access to documents (system)..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\documentsLibrary" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to pictures (system-wide)
+Write-Host "- Disabling app access to pictures (system)..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\picturesLibrary" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to videos (system-wide)
+Write-Host "- Disabling app access to videos (system)..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\videosLibrary" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable background app permissions
+Write-Host "- Disabling background app permissions..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" "GlobalUserDisabled" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app diagnostics
+Write-Host "- Disabling app diagnostics..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appDiagnostics" "Value" "Deny") { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable app access to documents library
+Write-Host "- Blocking automatic app installs from Store..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "SilentInstalledAppsEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Windows Update Delivery Optimization P2P
+Write-Host "- Disabling Delivery Optimization P2P..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" "DODownloadMode" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Wi-Fi Sense
+Write-Host "- Disabling Wi-Fi Sense..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting" "value" 0) { $tweakCount++ } else { $tweakErrors++ }
+if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots" "Enabled" 0) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Consumer Features
+Write-Host "- Disabling consumer features and suggested apps..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" "DisableWindowsConsumerFeatures" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable password reveal
+Write-Host "- Disabling password reveal button..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredUI" "DisablePasswordReveal" 1) { $tweakCount++ } else { $tweakErrors++ }
+
+# Disable Step Recorder
+Write-Host "- Disabling Windows Step Recorder..." -ForegroundColor Cyan
+if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppCompat" "DisableUAR" 1) { $tweakCount++ } else { $tweakErrors++ }
 Write-Host "- Clearing System Resource Usage Monitor data..." -ForegroundColor Cyan
 try {
     $srumPath = "$env:SystemRoot\System32\sru\SRUDB.dat"
