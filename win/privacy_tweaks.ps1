@@ -1,6 +1,7 @@
 # privacy_tweaks.ps1
 # Comprehensive Windows privacy tweaks extracted from privacy.sexy
 # This script applies advanced privacy settings and removes telemetry
+# Author: @mrfixit027
 
 # Check if running as Administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)

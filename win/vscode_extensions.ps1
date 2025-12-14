@@ -1,4 +1,8 @@
-﻿# List all extensions installed in VS Code
+﻿# vscode_extensions.ps1
+# VS Code Extensions Installer
+# Author: @mrfixit027
+
+# List all extensions installed in VS Code
 $vscodeExtensions = @(
     "aaron-bond.better-comments",
     "adpyke.codesnap",

@@ -1,6 +1,7 @@
 # dev_setup.ps1
 # Development environment setup for Windows
 # Installs WSL, Docker, Node.js, Python tools, and configures Git & AWS
+# Author: @mrfixit027
 
 # Check if running as Administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)

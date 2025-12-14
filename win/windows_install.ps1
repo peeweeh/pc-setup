@@ -1,5 +1,6 @@
 # windows_install.ps1
 # Chocolatey package installation script for Windows
+# Author: @mrfixit027
 
 # Check if running as Administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
