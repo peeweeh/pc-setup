@@ -86,7 +86,7 @@ $packages = @(
     "git.install",
     "git-delta",
     "github-desktop",
-    "glorious-core",
+
     "goggalaxy",
     "GoogleChrome",
     "googledrive",
@@ -138,72 +138,136 @@ $packages = @(
 $successCount = 0
 $failCount = 0
 $failedPackages = @()
+$skippedPackages = @()
 
-# Install GPU-specific packages first
-if ($gpuPackages.Count -gt 0) {
-    Write-Host "Installing GPU-specific packages first..." -ForegroundColor Cyan
+function Install-PackageGroup {
+    param($GroupName, $Packages, $SkipPrompt = $false)
+    
+    Write-Host ""
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "Installing $GroupName" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+    
+    if (-not $SkipPrompt) {
+        Write-Host "Packages to install: $($Packages.Count)" -ForegroundColor Yellow
+        Write-Host "Press Enter to continue, or type 'skip' to skip this group..." -ForegroundColor Yellow
+        $response = Read-Host
+        if ($response -eq "skip") {
+            Write-Host "Skipping $GroupName..." -ForegroundColor Yellow
+            $script:skippedPackages += $Packages
+            return
+        }
+    }
+    
     Write-Host ""
     
-    foreach ($package in $gpuPackages) {
+    foreach ($package in $Packages) {
         Write-Host "Installing $package..." -ForegroundColor Cyan
         try {
             choco install $package -y --ignore-checksums
             if ($LASTEXITCODE -eq 0) {
                 Write-Host "- $package installed successfully" -ForegroundColor Green
-                $successCount++
+                $script:successCount++
             } else {
                 Write-Host "- Failed to install $package" -ForegroundColor Red
-                $failCount++
-                $failedPackages += $package
+                $script:failCount++
+                $script:failedPackages += $package
             }
         } catch {
             Write-Host "- Error installing $package`: $_" -ForegroundColor Red
-            $failCount++
-            $failedPackages += $package
+            $script:failCount++
+            $script:failedPackages += $package
         }
         Write-Host ""
     }
 }
 
-foreach ($package in $packages) {
-    Write-Host "Installing $package..." -ForegroundColor Cyan
-    try {
-        choco install $package -y --ignore-checksums
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "- $package installed successfully" -ForegroundColor Green
-            $successCount++
-        } else {
-            Write-Host "- Failed to install $package" -ForegroundColor Red
-            $failCount++
-            $failedPackages += $package
-        }
-    } catch {
-        Write-Host "- Error installing $package`: $_" -ForegroundColor Red
-        $failCount++
-        $failedPackages += $package
-    }
-    Write-Host ""
+# Essential packages (important)
+$essentialPackages = @(
+    "1password",
+    "beeper-app",
+    "brave",
+    "protonmail",
+    "protonvpn",
+    "protondrive",
+    "vlc.install",
+    "winrar",
+    "7zip.install",
+    "git.install",
+    "vscode.install",
+    "discord.install",
+
+    "dotnet-desktopruntime",
+    "webview2-runtime",
+    "googledrive"
+)
+
+# Optional packages (nice to have)
+$optionalPackages = @(
+    "telegram.install",
+    "signal",
+    "whatsapp",
+    "bat",
+    "calibre",
+    "chatgpt",
+    "chocolateygui",
+    "clipchamp",
+    "curl",
+    "ddu",
+    "ea-app",
+    "epicgameslauncher",
+    "everything",
+    "fd",
+    "ffmpeg",
+    "fzf",
+    "gh",
+    "git-delta",
+    "github-desktop",
+    "glorious-core",
+    "goggalaxy",
+    "GoogleChrome",
+    "hwinfo.install",
+    "hwmonitor.install",
+    "icloud",
+    "iTunes",
+    "jq",
+    "less",
+    "linqpad",
+    "microsoft-edge",
+    "microsoft-teams",
+    "microsoft-windows-terminal",
+    "msiafterburner",
+    "neovim",
+    "nodejs.install",
+    "obsidian",
+    "pandoc",
+    "plexmediaplayer",
+    "postman",
+    "powertoys",
+    "python314",
+    "ripgrep",
+    "rivatuner",
+    "sabnzbd",
+    "slack",
+    "starship.install",
+    "steam",
+    "steelseries-gg",
+    "sysinternals",
+    "treesizefree",
+    "ubisoft-connect",
+    "wireshark",
+    "wiztree",
+    "zoxide",
+    "zoom"
+)
+
+# Install GPU drivers if detected (automatic, no prompt)
+if ($gpuPackages.Count -gt 0) {
+    Install-PackageGroup -GroupName "GPU Drivers" -Packages $gpuPackages -SkipPrompt $true
 }
 
-# Step 4: Summary
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Installation Summary" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Total packages: $($packages.Count + $gpuPackages.Count)" -ForegroundColor White
-Write-Host "Successfully installed: $successCount" -ForegroundColor Green
-Write-Host "Failed: $failCount" -ForegroundColor $(if ($failCount -gt 0) { "Red" } else { "Green" })
-
-if ($failedPackages.Count -gt 0) {
-    Write-Host ""
-    Write-Host "Failed packages:" -ForegroundColor Red
-    foreach ($pkg in $failedPackages) {
-        Write-Host "  - $pkg" -ForegroundColor Red
-    }
-}
-
-Write-Host ""
-Write-Host "Setup complete!" -ForegroundColor Green
-Write-Host "You may need to restart your terminal or computer for all changes to take effect." -ForegroundColor Yellow
+# Install essential packages
+Install-PackageGroup -GroupName "Essential Packages" -Packages $essentialPackages
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
@@ -251,25 +315,7 @@ try {
     $tweakErrors++
 }
 
-# Disable Telemetry
-Write-Host "- Disabling telemetry..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "AllowTelemetry" 0) { $tweakCount++ } else { $tweakErrors++ }
-if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" "AllowTelemetry" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Consumer Features
-Write-Host "- Disabling consumer features..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" "DisableWindowsConsumerFeatures" 1) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Activity History
-Write-Host "- Disabling activity history..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" "EnableActivityFeed" 0) { $tweakCount++ } else { $tweakErrors++ }
-if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" "PublishUserActivities" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable GameDVR
-Write-Host "- Disabling GameDVR..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\System\GameConfigStore" "GameDVR_Enabled" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Hibernation
+# Disable Hibernation (performance)
 Write-Host "- Disabling hibernation..." -ForegroundColor Cyan
 try {
     powercfg.exe /hibernate off | Out-Null
@@ -278,122 +324,23 @@ try {
     $tweakErrors++
 }
 
-# Disable Location Tracking
-Write-Host "- Disabling location tracking..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" "DisableLocation" 1) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Wi-Fi Sense
-Write-Host "- Disabling Wi-Fi sense..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting" "Value" 0) { $tweakCount++ } else { $tweakErrors++ }
-if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots" "Value" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Enable End Task with Right Click
+# Enable End Task with Right Click (convenience)
 Write-Host "- Enabling end task with right click..." -ForegroundColor Cyan
 if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" "TaskbarEndTask" 1) { $tweakCount++ } else { $tweakErrors++ }
 
-# Disable Notifications
-Write-Host "- Disabling notifications..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings" "NOC_GLOBAL_SETTING_ALLOW_NOTIFICATION_SOUND" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable App Suggestions
-Write-Host "- Disabling app suggestions..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "ContentDeliveryAllowed" 0) { $tweakCount++ } else { $tweakErrors++ }
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "OemPreInstalledAppsEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "PreInstalledAppsEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "SilentInstalledAppsEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" "SystemPanelFirstRunCompleted" 1) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Background Apps
-Write-Host "- Disabling background apps..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" "GlobalUserDisabled" 1) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Telemetry Services
-Write-Host "- Disabling telemetry services..." -ForegroundColor Cyan
-try {
-    Stop-Service -Name "DiagTrack" -ErrorAction SilentlyContinue
-    Set-Service -Name "DiagTrack" -StartupType Disabled -ErrorAction SilentlyContinue
-    $tweakCount++
-} catch {
-    $tweakErrors++
-}
-
-try {
-    Stop-Service -Name "dmwappushservice" -ErrorAction SilentlyContinue
-    Set-Service -Name "dmwappushservice" -StartupType Disabled -ErrorAction SilentlyContinue
-    $tweakCount++
-} catch {
-    $tweakErrors++
-}
-
-# Disable Cortana
-Write-Host "- Disabling Cortana..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Personalization\Settings" "AcceptedPrivacyPolicy" 0) { $tweakCount++ } else { $tweakErrors++ }
-if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" "AllowCortana" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Bing Search in Start Menu
-Write-Host "- Disabling Bing search in Start menu..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" "BingSearchEnabled" 0) { $tweakCount++ } else { $tweakErrors++ }
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" "CortanaConsent" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Ad ID
-Write-Host "- Disabling advertising ID..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" "Enabled" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Connected User Experiences
-Write-Host "- Disabling connected user experiences..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" "EnableCdp" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable App Launch Tracking
-Write-Host "- Disabling app launch tracking..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" "Start_TrackProgs" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Tips and Suggestions
-Write-Host "- Disabling tips and suggestions..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\CloudStore\Store\Cache\DefaultAccount\*" "IsContentDirty" 0) { $tweakCount++ } else { $tweakErrors++ }
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" "NoInstrumentation" 1) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Delivery Optimization
-Write-Host "- Disabling delivery optimization..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" "DODownloadMode" 0) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Error Reporting
-Write-Host "- Disabling error reporting..." -ForegroundColor Cyan
-try {
-    Stop-Service -Name "WerSvc" -ErrorAction SilentlyContinue
-    Set-Service -Name "WerSvc" -StartupType Disabled -ErrorAction SilentlyContinue
-    $tweakCount++
-} catch {
-    $tweakErrors++
-}
-
-# Disable Connect to Suggested Open With
-Write-Host "- Disabling connect to suggested open with..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" "NoUseStoreOpenWith" 1) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Autoplay
+# Disable Autoplay (performance)
 Write-Host "- Disabling autoplay..." -ForegroundColor Cyan
 if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" "DisableAutoplay" 1) { $tweakCount++ } else { $tweakErrors++ }
 
-# Set Services to Manual
-Write-Host "- Setting services to manual startup..." -ForegroundColor Cyan
-$servicesToDisable = @(
-    "WSearch",           # Windows Search
-    "DiagTrack",         # Diagnostic Tracking Service
-    "dmwappushservice",  # Device Management Wireless Application Protocol
-    "MapsBroker",        # Maps
-    "lfsvc",             # Location Service
-    "RemoteRegistry",    # Remote Registry
-    "SharedAccess"       # Internet Connection Sharing
-)
-
-foreach ($service in $servicesToDisable) {
-    try {
-        Set-Service -Name $service -StartupType Manual -ErrorAction SilentlyContinue
-        $tweakCount++
-    } catch {
-        $tweakErrors++
-    }
+# Set Delivery Optimization to manual (can use data)
+Write-Host "- Setting Delivery Optimization to manual..." -ForegroundColor Cyan
+try {
+    Set-Service -Name "DoSvc" -StartupType Manual -ErrorAction SilentlyContinue
+    $tweakCount++
+} catch {
+    $tweakErrors++
 }
+
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Tweaks Summary" -ForegroundColor Cyan
@@ -401,6 +348,31 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Successfully applied: $tweakCount tweaks" -ForegroundColor Green
 if ($tweakErrors -gt 0) {
     Write-Host "Failed: $tweakErrors tweaks" -ForegroundColor Red
+}
+
+Write-Host ""
+
+# Install optional packages
+Install-PackageGroup -GroupName "Optional Packages" -Packages $optionalPackages
+
+# Step 5: Final Summary
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Installation Summary" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Total packages: $($essentialPackages.Count + $optionalPackages.Count + $gpuPackages.Count)" -ForegroundColor White
+Write-Host "Successfully installed: $successCount" -ForegroundColor Green
+Write-Host "Failed: $failCount" -ForegroundColor $(if ($failCount -gt 0) { "Red" } else { "Green" })
+
+if ($skippedPackages.Count -gt 0) {
+    Write-Host "Skipped: $($skippedPackages.Count)" -ForegroundColor Yellow
+}
+
+if ($failedPackages.Count -gt 0) {
+    Write-Host ""
+    Write-Host "Failed packages:" -ForegroundColor Red
+    foreach ($pkg in $failedPackages) {
+        Write-Host "  - $pkg" -ForegroundColor Red
+    }
 }
 
 Write-Host ""

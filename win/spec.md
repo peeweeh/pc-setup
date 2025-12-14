@@ -102,7 +102,85 @@ Registry modifications and system changes:
 
 ---
 
-## 2. `vscode_extensions.ps1` - VS Code Extensions Setup
+## 2. `privacy_tweaks.ps1` - Advanced Privacy Configuration
+
+**Purpose**: Applies comprehensive privacy tweaks extracted from privacy.sexy. Disables telemetry, data collection, and enhances user privacy by modifying registry settings and disabling telemetry services.
+
+**Target Audience**:
+- Privacy-conscious users
+- Users wanting to minimize Windows data collection
+- Professional environments requiring privacy compliance
+
+**Prerequisites**:
+- Administrator privileges
+- Windows 10/11 (all versions)
+
+**What It Does**:
+
+### 2.1 User & System Cleanup
+- Removes controversial `defaultuser0` user account
+- Minimizes DISM "Reset Base" update data
+- Clears System Resource Usage Monitor (SRUM) database
+
+### 2.2 Communication & Speech Privacy
+- Disables cloud-based speech recognition
+- Opts out of Windows privacy consent
+- Disables text and handwriting data collection
+
+### 2.3 Feedback & Telemetry Disabling
+- Disables Windows feedback collection
+- Disables app diagnostics
+- Disables diagnostic data collection
+- Disables Windows Error Reporting service (WerSvc)
+- Stops and disables DiagTrack (Connected User Experiences and Telemetry)
+- Disables Device Metadata Retrieval service (dmwappushservice)
+
+### 2.4 Content & App Management
+- Disables app suggestions and recommendations
+- Disables Start menu suggestions
+- Disables app launch tracking
+- Removes Microsoft consumer experiences content subscriptions
+
+### 2.5 Personalization & Targeting
+- Disables tailored experiences
+- Disables activity history and history clearing on exit
+- Disables Cortana and search indexing
+- Disables inking and typing personalization
+- Disables advertising ID tracking
+
+### 2.6 System Services & Features
+- Disables clipboard history
+- Disables connected experiences
+- Disables settings synchronization
+- Sets services to manual or disabled mode
+
+**Registry Modifications** (40+ registry entries):
+- `HKCU:\SOFTWARE\Microsoft\...` - User-level privacy settings
+- `HKLM:\SOFTWARE\Microsoft\...` - System-level privacy settings
+- `HKLM:\SOFTWARE\Policies\...` - Group Policy privacy settings
+
+**Services Modified**:
+- DiagTrack (Diagnostic Tracking Service)
+- dmwappushservice (Device Management Wireless Application Protocol)
+- WerSvc (Windows Error Reporting)
+
+**Error Handling**:
+- Try/catch blocks for service management
+- Graceful handling of missing registry paths
+- Continues execution if individual tweaks fail
+- Reports success and failure counts
+
+**Expected Runtime**: 2-5 minutes
+
+**Reversibility**: Most changes can be reversed by running O&O ShutUp10++ or using System Restore point
+
+**Post-Script Actions**:
+- Restart computer for service changes to take effect
+- Verify privacy settings in Windows Settings
+
+---
+
+## 3. `vscode_extensions.ps1` - VS Code Extensions Setup
 
 **Purpose**: Installs a curated set of Visual Studio Code extensions for development productivity.
 
@@ -168,7 +246,7 @@ Registry modifications and system changes:
 
 ---
 
-## 3. `dev_setup.ps1` - Development Environment Setup
+## 4. `dev_setup.ps1` - Development Environment Setup
 
 **Purpose**: Sets up development-specific tools for software developers.
 
@@ -186,7 +264,7 @@ Registry modifications and system changes:
 
 **What It Will Do**:
 
-### 3.1 WSL (Windows Subsystem for Linux)
+### 4.1 WSL (Windows Subsystem for Linux)
 - Install WSL2 with Ubuntu (latest LTS)
 - Enable systemd support
 - Install essential build tools in Ubuntu:
@@ -196,7 +274,7 @@ Registry modifications and system changes:
 - Configure Git in WSL (username, email)
 - Set up SSH keys for GitHub
 
-### 3.2 Docker Desktop
+### 4.2 Docker Desktop
 - Download and install Docker Desktop
 - Configure to use WSL2 backend
 - Enable WSL integration with Ubuntu
@@ -207,7 +285,7 @@ Registry modifications and system changes:
 - Install Docker Compose
 - Add Docker aliases to PowerShell profile
 
-### 3.3 Node.js
+### 4.3 Node.js
 - Install NVM (Node Version Manager) for Windows
 - Install Node.js LTS version
 - Install Node.js current version
@@ -217,7 +295,7 @@ Registry modifications and system changes:
   - `eslint`, `prettier`
   - `nodemon`
 
-### 3.4 Python
+### 4.4 Python
 - Verify Python is installed (from `windows_install.ps1`)
 - Install `pipx` for global Python tools
 - Install Python dev tools:
@@ -226,7 +304,7 @@ Registry modifications and system changes:
   - `pytest` (testing)
   - `jupyter` (notebooks)
 
-### 3.5 Git Configuration
+### 4.5 Git Configuration
 - Configure global Git settings:
   - Set username and email (prompts user)
   - Default branch: `main`
@@ -238,7 +316,7 @@ Registry modifications and system changes:
   - `git lg` = `log --graph --oneline --all`
 - Configure VS Code as default diff/merge tool
 
-### 3.6 AWS Setup
+### 4.6 AWS Setup
 - Verify AWS CLI is installed (from `windows_install.ps1`)
 - Configure AWS credentials (prompts for access key and secret)
 - Set default region
@@ -246,7 +324,7 @@ Registry modifications and system changes:
 - Install AWS CDK (Cloud Development Kit)
 - Test AWS connection with `aws sts get-caller-identity`
 
-### 3.7 Verification & Summary
+### 4.7 Verification & Summary
 - Check all tool versions:
   - WSL/Ubuntu, Docker, Node.js, Python, Git, AWS CLI
 - Run basic tests:
