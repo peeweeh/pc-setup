@@ -3,7 +3,7 @@
 # Interactive macOS Setup Script
 # Author: mrfixit027
 # Repository: https://github.com/peeweeh/pc-setup
-# Run from anywhere: bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/install.sh)
+# Run from anywhere: bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
 #
 
 set -e  # Exit on error

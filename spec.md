@@ -455,12 +455,12 @@ sudo /Users/paul/dev/pc-setup/mac/privacy.sh
 pc-setup/
 ├── README.md              # Project overview and quick start
 ├── spec.md               # This file - detailed specifications
-├── install.sh            # Interactive installer for macOS
 ├── DEVELOPMENT.md        # Development guidelines
 ├── CONTRIBUTING.md       # Contribution guidelines
 ├── LICENSE              # MIT License
 ├── mac/                 # macOS setup scripts
 │   ├── README.md         # macOS scripts documentation
+│   ├── install.sh        # Interactive installer for macOS
 │   ├── brew_install.sh   # Homebrew application installation
 │   ├── mac_install.sh    # Performance & UI optimization
 │   ├── vscode.sh         # VS Code extensions

@@ -54,7 +54,7 @@ Installs Visual Studio Code extensions
 **Run this command in Terminal** for an interactive menu:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
 ```
 
 **Choose from:**
