@@ -28,6 +28,11 @@ if (-not $isAdmin) {
     exit 1
 }
 
+Write-Host ""
+Write-Host "PC Setup Installer by @mrfixit027" -ForegroundColor Cyan
+Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
+Write-Host ""
+
 # Determine script location (local or web)
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 if ([string]::IsNullOrEmpty($scriptPath)) {
@@ -219,6 +224,11 @@ do {
         }
     }
 } while ($true)
+
+Write-Host ""
+Write-Host "Script by @mrfixit027" -ForegroundColor Cyan
+Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
+Write-Host ""
 
 ################################################################################
 # End of install.ps1

@@ -6,6 +6,11 @@
 # GitHub: https://github.com/peeweeh/pc-setup
 ################################################################################
 
+Write-Host ""
+Write-Host "VS Code Extensions Installer by @mrfixit027" -ForegroundColor Cyan
+Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
+Write-Host ""
+
 # List all extensions installed in VS Code
 $vscodeExtensions = @(
     "aaron-bond.better-comments",
@@ -72,6 +77,11 @@ $scriptContent = foreach ($extension in $vscodeExtensions) {
 }
 
 $scriptContent | Out-File -Encoding UTF8 -FilePath 'InstallVsCodeExtensions.ps1'
+
+Write-Host ""
+Write-Host "Script by @mrfixit027" -ForegroundColor Cyan
+Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
+Write-Host ""
 
 ################################################################################
 # End of vscode_extensions.ps1

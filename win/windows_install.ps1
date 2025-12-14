@@ -17,6 +17,8 @@ if (-not $isAdmin) {
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Windows Setup Script" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "By @mrfixit027" -ForegroundColor Cyan
+Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
 Write-Host ""
 
 # Step 1: Install Chocolatey
@@ -386,6 +388,9 @@ Write-Host "Setup Complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Please restart your computer for all changes to take effect." -ForegroundColor Yellow
+Write-Host ""
+Write-Host "Script by @mrfixit027" -ForegroundColor Cyan
+Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
 Write-Host ""
 
 ################################################################################

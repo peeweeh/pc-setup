@@ -18,6 +18,8 @@ if (-not $isAdmin) {
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Windows Privacy Tweaks (privacy.sexy)" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "By @mrfixit027" -ForegroundColor Cyan
+Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
 Write-Host ""
 
 $tweakCount = 0
@@ -456,6 +458,9 @@ Write-Host "Please restart your computer for all changes to take effect." -Foreg
 Write-Host ""
 Write-Host "Note: This script applies privacy tweaks from privacy.sexy" -ForegroundColor Gray
 Write-Host "Source: https://privacy.sexy" -ForegroundColor Gray
+Write-Host ""
+Write-Host "Script by @mrfixit027" -ForegroundColor Cyan
+Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
 Write-Host ""
 
 ################################################################################

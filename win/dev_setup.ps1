@@ -18,6 +18,8 @@ if (-not $isAdmin) {
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Development Environment Setup" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "By @mrfixit027" -ForegroundColor Cyan
+Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
 Write-Host ""
 
 $successCount = 0
@@ -509,6 +511,11 @@ if ($restart -eq "y") {
     Start-Sleep -Seconds 10
     Restart-Computer -Force
 }
+
+Write-Host ""
+Write-Host "Script by @mrfixit027" -ForegroundColor Cyan
+Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
+Write-Host ""
 
 ################################################################################
 # End of dev_setup.ps1
