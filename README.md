@@ -2,16 +2,42 @@
 
 Automated setup scripts for Windows and macOS to quickly configure a new development environment with essential applications, tools, and system tweaks.
 
+## ⚡ TL;DR - Quick Start
+
+### Windows (Run as Administrator)
+```powershell
+powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/install.ps1 | iex"
+```
+
+### macOS
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
+```
+
+Both open interactive menus with 5 options:
+1. **📦 Install Applications** (40-74+ apps)
+2. **⚙️ Optimize System** / **🔧 Development Setup**
+3. **🎨 Install VS Code Extensions** (50-68+ extensions)
+4. **🔒 Privacy Hardening**
+5. **🚀 Install ALL** (recommended for fresh system)
+
+---
+
 ## 📋 Table of Contents
 
+- [Quick Start](#tldr---quick-start)
 - [Features](#features)
-- [Windows Setup](#windows-setup)
-- [macOS Setup](#macos-setup)
 - [Prerequisites](#prerequisites)
-- [Usage](#usage)
+- [Detailed Usage](#detailed-usage)
 - [What Gets Installed](#what-gets-installed)
+- [Detailed Script Reference](#detailed-script-reference)
 - [Customization](#customization)
-- [License](#license)
+- [Privacy & Security](#privacy--security)
+- [Important Notes](#important-notes)
+- [Contributing](#contributing)
+- [Support](#support)
+
+---
 
 ## ✨ Features
 
@@ -36,11 +62,30 @@ Automated setup scripts for Windows and macOS to quickly configure a new develop
 - **Dock & Finder Customization** - Auto-hide, speed improvements, clean layout
 - **Terminal Theme** - Nord color scheme for beautiful terminal
 
-## 🪟 Windows Setup
+---
+
+## 📋 Prerequisites
+
+### Windows
+- Windows 10/11
+- **Administrator privileges required**
+- PowerShell 5.1 or later
+- Internet connection
+
+### macOS
+- macOS 10.15 or later
+- Internet connection
+- Xcode Command Line Tools (automatically prompted during Homebrew installation)
+
+---
+
+## 🚀 Detailed Usage
+
+### Windows Setup
 
 **Author**: [@mrfixit027](https://github.com/mrfixit027)
 
-### 🚀 Interactive Installer (Recommended)
+#### Interactive Installer (Recommended)
 
 **Run this command in PowerShell as Administrator**:
 
@@ -48,14 +93,13 @@ Automated setup scripts for Windows and macOS to quickly configure a new develop
 powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/install.ps1 | iex"
 ```
 
-Or run locally:
+Or run locally after cloning:
 ```powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force
 & ".\win\install.ps1"
 ```
 
-The installer presents a colored menu where you can choose which components to install:
-
+The installer shows a menu:
 ```
 ========================================
      PC Setup - Master Installer
@@ -71,148 +115,35 @@ Choose an option:
 q) ❌ Quit
 ```
 
-**Choose from:**
-- **Option 1** - Install 74+ applications via Chocolatey
-- **Option 2** - Setup development environment (WSL2, Docker, Node, Python, AWS)
-- **Option 3** - Install 50+ VS Code extensions
-- **Option 4** - Privacy hardening (telemetry, Cortana, feedback)
-- **Option 5** - Run all scripts in sequence (best for fresh Windows)
+#### Just Install Applications
 
-### Scripts Overview
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/windows_install.ps1 | iex
+```
 
-#### `install.ps1` (Interactive Menu)
-Master installer with menu-driven setup orchestration:
-- Beautiful colored menu interface with emoji status
-- Select individual scripts or run all
-- Proper error handling and progress tracking
-- Automatically handles PowerShell execution policy
-- Downloads scripts from GitHub on-the-fly (no manual cloning required)
+#### Just Development Setup
 
-#### `windows_install.ps1` (74+ Applications)
-Comprehensive Windows setup script with:
-- **Automatic Chocolatey installation** if not present
-- **GPU detection** - Detects NVIDIA/AMD and installs appropriate drivers
-  - NVIDIA: Installs nvidia-app and nvidia-physx
-  - AMD: Prompts user to download drivers manually
-- **System restore point** created before applying tweaks
-- **74+ applications** organized by category:
-  - **Productivity**: 1Password, PowerToys, 7-Zip, WinRAR, Sysinternals, Everything, TreeSizeFree
-  - **Browsers**: Chrome, Edge, Brave, Arc
-  - **Development**: Git, VS Code, Node.js, Python, Postman, DevToys, Neovim
-  - **CLI Tools**: fzf, bat, ripgrep, fd, jq, git-delta, zoxide, curl, ffmpeg
-  - **Communication**: Slack, Teams, Discord, Signal, Telegram, WhatsApp, Beeper, Amazon Chime
-  - **Media**: VLC, Plex Media Player
-  - **Gaming**: Steam, Epic Games, EA App, GOG Galaxy, Ubisoft Connect
-  - **Cloud Storage**: Google Drive, iCloud, Proton Drive
-  - **System Monitoring**: HWiNFO, MSI Afterburner, RivaTuner
-  - **Security**: Proton VPN, Proton Mail
-  - **Graphics**: GPU detection and driver installation
-- **Windows Privacy & Performance Tweaks**:
-  - Disables telemetry and diagnostic data collection
-  - Disables location tracking and Wi-Fi Sense
-  - Disables consumer features and app suggestions
-  - Disables GameDVR and Xbox features
-  - Disables cortana and feedback collection
-  - Enables "End Task" right-click on taskbar
-  - Runs disk cleanup
-  - Disables hibernation (saves SSD space)
-  - Disables storage sense optimization
-- **Oh My Posh Configuration**:
-  - Installs Oh My Posh with atomic theme
-  - Installs Nerd Fonts (FiraMono, FiraCode)
-  - Creates/backs up PowerShell profile
-- **PowerShell Modules**:
-  - PSReadLine (enhanced command-line editing)
-  - Terminal-Icons (file/folder icons in directory listings)
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/dev_setup.ps1 | iex
+```
 
-**Runtime**: 20-60 minutes depending on internet speed
+#### Just VS Code Extensions
 
-#### `dev_setup.ps1` (Development Environment)
-Development environment setup with:
-- **WSL2 (Windows Subsystem for Linux) Installation**
-  - Installs WSL with Ubuntu
-  - Configures WSL resources and networking
-- **Docker Desktop Setup**
-  - Installs Docker Desktop via Chocolatey
-  - Enables Docker integration with WSL2
-- **Development Tools**:
-  - Node.js and npm package manager
-  - Python with pip and common packages (requests, flask, numpy, pandas)
-  - Git configuration (user.name, user.email, core.editor)
-- **AWS Configuration**
-  - AWS CLI installation and configuration
-  - AWS credentials setup with interactive prompts
-- **Version Control**:
-  - Git configuration
-  - GitHub CLI (gh) setup
-  - SSH key generation for GitHub
-- **Language SDKs**:
-  - Go installation and path setup
-  - Rust installation (via rustup)
-  - Java JDK installation
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/vscode_extensions.ps1 | iex
+```
 
-**Runtime**: 30-45 minutes
-
-#### `privacy_tweaks.ps1` (Advanced Privacy)
-Comprehensive Windows privacy hardening (471 lines):
-- **Disables telemetry**: Diagnostic data, feedback collection, activity history
-- **Removes tracking**: Location services, Wi-Fi Sense, cloud-based speech recognition
-- **Disables spyware**: Cortana, Siri integration, consumer features
-- **Privacy policies**: Opts out of Windows privacy consent, personalization
-- **App diagnostics**: Disables app data collection
-- **Input privacy**: Disables text/handwriting data collection
-- **Start menu**: Removes app suggestions and tiles
-- **Network privacy**: Disables network suggestions
-- **General privacy**: Removes default user accounts, minimizes DISM data
-
-**Runtime**: 3-5 minutes
-
-#### `vscode_extensions.ps1` (50+ Extensions)
-Installs 50+ professionally-selected VS Code extensions:
-
-**AI & Productivity**:
-- GitHub Copilot, Amazon Q, Claude, Continue, DS Code GPT
-
-**Themes & Icons**:
-- Nord, Dracula, One Dark Pro, Material Theme, vscode-icons
-
-**AWS & Cloud**:
-- AWS Toolkit, Terraform, CloudFormation, Kubernetes
-
-**Code Quality**:
-- ESLint, Prettier, CodeSnap, Turbo Console Log, Better Comments
-
-**Git & Version Control**:
-- GitLens, Git History, Atlassian
-
-**Languages**:
-- Python (Autopep8, isort, Pylance), Go, GraphQL, JavaScript, TypeScript
-
-**DevOps & Infrastructure**:
-- Docker, Kubernetes, AWS Toolkit, Terraform, Remote Containers, GitHub Actions
-
-**Data & Analysis**:
-- Jupyter, Python, Pandas extensions, REST Client, Thunder Client
-
-**Utilities**:
-- Edge DevTools, PowerShell, Live Share, YAML, Markdown, Excel Viewer
-
-**Runtime**: 10-15 minutes
-
-## 🍎 macOS Setup
+### macOS Setup
 
 **Author**: [@mrfixit027](https://github.com/mrfixit027)
 
-### 🚀 Interactive Installer (Recommended)
-
-**Run this command in Terminal** for an interactive menu:
+#### Interactive Installer (Recommended)
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
 ```
 
-The installer presents a beautiful colored menu where you can choose which components to install:
-
+Shows menu:
 ```
 ╔═══════════════════════════════════════════════════╗
 ║   🍎 macOS Setup Script - Choose an Option       ║
@@ -227,238 +158,40 @@ The installer presents a beautiful colored menu where you can choose which compo
 q) ❌ Quit
 ```
 
-**Choose from:**
-- **Option 1** - Install 40+ applications via Homebrew
-- **Option 2** - Optimize system performance, UI speed, and battery life
-- **Option 3** - Install 68+ VS Code extensions
-- **Option 4** - Advanced privacy and security hardening
-- **Option 5** - Run all scripts in sequence (recommended for fresh Mac)
+#### Just Install Applications
 
-### Quick Start (Individual Scripts)
-
-**Just install apps:**
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/brew_install.sh)
 ```
 
-**Just optimize system:**
+#### Just Optimize System
+
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_install.sh)
 ```
 
-**Just install VS Code extensions:**
+#### Just VS Code Extensions
+
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/vscode.sh)
 ```
 
-**Just harden privacy:**
+#### Just Privacy Hardening
+
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/privacy.sh)
 ```
 
-### Scripts Overview
+#### Run Locally from Cloned Repository
 
-#### `install.sh` (Interactive Menu)
-Main entry point for setting up macOS:
-- Beautiful colored menu interface with emoji status
-- Select individual scripts or run all
-- Proper error handling and progress tracking
-- Automatically elevates to sudo when needed
-- Downloads scripts from GitHub on-the-fly (no manual cloning required)
-
-#### `brew_install.sh` (40+ Applications)
-Comprehensive Homebrew installation script with:
-- **Automatic Homebrew installation** if not present (handles Apple Silicon & Intel)
-- **Priority app installation** - Critical apps (1Password, Arc) installed first
-- **Smart ordering** - Smaller/faster apps first, heavy apps last for better user experience
-- **Idempotent design** - Safe to run multiple times without duplication
-- **Error handling** - Exits cleanly on any installation failure
-- **Colored output** with emoji status indicators
-
-**Applications installed:**
-- **Essentials**: 1Password, Arc, Google Chrome, Brave, VS Code, Docker
-- **Development**: Git, AWS CLI, Postman, Warp, Node.js, Go, Python, Ollama
-- **Communication**: Slack, Teams, Discord, Signal, WhatsApp, Zoom
-- **Utilities**: Rectangle, Raycast, BetterMouse, Finder enhancements
-- **CLI Tools**: bat, fzf, eza, btop, jq, ripgrep, exa
-- **Configuration**: Oh My Zsh with Powerlevel10k, syntax highlighting, auto-suggestions
-- **Service Management**: Disables auto-start for Docker, Ollama, VPNs
-
-#### `mac_install.sh` (System Optimization)
-Comprehensive macOS customization and performance optimization:
-
-**Performance Enhancements:**
-- Disables Siri and Siri suggestions (reclaims system resources)
-- Disables Photos AI processing (stops memory/storage drain)
-- Disables Media AI features (eliminates background processing)
-- Disables Game Center and related services
-- Fixes macOS Sonoma lag issues
-- Optimizes launchd services
-
-**UI Speed Improvements:**
-- Instant window resize animations
-- Instant Dock appearance on hover
-- Removes all UI animation delays
-- Speeds up Mission Control and Exposé
-- Disables smooth scrolling delays
-- Faster screenshot saving
-
-**Dock & Finder Configuration:**
-- Auto-hide Dock (saves screen space)
-- Removes recents from Dock
-- Shows hidden files and file extensions
-- Enables path bar and status bar
-- Single-click proxy icons
-- Proper directory default views
-
-**Input & System Settings:**
-- Fast keyboard repeat rate
-- Trackpad gestures configuration
-- Modifier key mapping
-- Screen resolution optimization
-- Click speed adjustment
-- Hot corner configuration
-
-**Terminal & Shell:**
-- Nord theme installation (beautiful color scheme)
-- Oh My Zsh setup with plugins
-- Powerlevel10k prompt configuration
-- Syntax highlighting and auto-suggestions enabled
-
-#### `vscode.sh` (68+ Extensions)
-Automated VS Code extension installation with categorized setup:
-
-**AI & Productivity:**
-- GitHub Copilot, Amazon Q, Claude (Anthropic)
-- Tabnine, Continue Dev
-
-**Visual Themes:**
-- Nord, Dracula, One Dark, Material Icon Theme
-- Icons, Nerd Font icons
-
-**Language Support:**
-- Python, JavaScript/TypeScript, Go, GraphQL
-- Rust, C/C++, Java, SQL
-
-**DevOps & Infrastructure:**
-- Docker, Kubernetes, Terraform
-- AWS Toolkit, CloudFormation
-- Azure Tools, Google Cloud Code
-
-**Git & Version Control:**
-- GitLens, Git History, Git Graph
-- GitHub Copilot (for PR reviews)
-
-**Development Tools:**
-- Jupyter, REST Client, Thunder Client
-- Prettier, ESLint, Pylint
-- Postman
-
-**Utilities:**
-- Markdown Preview, Better Comments
-- Code Spell Checker, Peacock
-- Error Lens, Peacock Favorites
-- Todo Tree, Bookmarks
-
-**Gaming Mods:**
-- Minecraft tools, Game Modding support
-
-**Features:**
-- Colored progress output with statistics
-- Automatically skips already-installed extensions
-- Generates backup installation script (InstallVsCodeExtensions.sh)
-- Shows total count and installation time
-- Requires VS Code CLI in PATH (automatically detected)
-
-#### `privacy.sh` (Advanced Privacy Hardening)
-Comprehensive privacy and security hardening (831 lines):
-- **Framework**: Generated from [privacy.sexy](https://privacy.sexy) framework
-- **Comprehensive Siri disabling**: All Siri services, suggestions, and data collection
-- **Telemetry blocking**: Firefox, Microsoft Office, Homebrew, .NET Core, PowerShell
-- **System cleaning**: Cache clearing, DNS purging, Xcode cache, trash, logs
-- **Privacy features**: Location services, Bluetooth, accessibility permissions
-- **Security hardening**: Firewall configuration, remote access disabling, guest user removal
-- **iCloud settings**: Document storage, photo sync, keychain settings
-- **Advanced features**: System integrity protection checks, firmware updates, secure boot
-
-⚠️ **Note**: This is an advanced script with 831 lines of hardening rules. Review specific sections before running if you have concerns about compatibility with your workflow.
-
-## 📦 Prerequisites
-
-### Windows
-- Windows 10/11
-- **Administrator privileges required**
-- PowerShell 5.1 or later
-- Internet connection
-
-### macOS
-- macOS 10.15 or later
-- Internet connection
-- Xcode Command Line Tools (automatically prompted during Homebrew installation)
-
-## 🚀 Usage
-
-### Windows
-
-**Recommended: Interactive Installer** (run as Administrator):
-
-1. **Right-click PowerShell** and select **"Run as Administrator"**
-2. **Copy and paste this command**:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/install.ps1 | iex"
-   ```
-
-The installer will show a menu where you can choose:
-- **Option 1**: Install Applications (windows_install.ps1)
-- **Option 2**: Setup Development Environment (dev_setup.ps1)
-- **Option 3**: Install VS Code Extensions (vscode_extensions.ps1)
-- **Option 4**: Privacy Hardening (privacy_tweaks.ps1)
-- **Option 5**: Install ALL (recommended for fresh Windows)
-
-**Just windows_install.ps1:**
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; iwr -useb https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/windows_install.ps1 | iex
-```
-
-The script will:
-- Install Chocolatey (if not present)
-- Detect your GPU and install drivers (NVIDIA auto-detected, AMD manual)
-- Install 74+ applications via Chocolatey
-- Apply Windows privacy & performance tweaks
-- Configure Oh My Posh with Nerd Fonts
-- Install PowerShell modules (PSReadLine, Terminal-Icons)
-- Create system restore point for safety
-
-**Alternative: Run locally from cloned repo**:
-```powershell
-git clone https://github.com/peeweeh/pc-setup.git
-cd pc-setup/win
-Set-ExecutionPolicy Bypass -Scope Process -Force
-& ".\install.ps1"
-```
-
-### macOS
-
-**Recommended: Interactive Installer**:
-
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
-```
-
-The installer will show a menu where you can choose:
-- **Option 1**: Install Applications (brew_install.sh)
-- **Option 2**: Optimize System (mac_install.sh)
-- **Option 3**: Install VS Code Extensions (vscode.sh)
-- **Option 4**: Privacy Hardening (privacy.sh)
-- **Option 5**: Install ALL (recommended for fresh Mac)
-
-**Alternative: Run locally from cloned repo**:
 ```bash
 git clone https://github.com/peeweeh/pc-setup.git
 cd pc-setup/mac
 chmod +x *.sh
 ./install.sh
 ```
+
+---
 
 ## 📦 What Gets Installed
 
@@ -625,6 +358,190 @@ chmod +x *.sh
 #### CLI Tools
 - bat, fzf, exa
 - Powerlevel10k
+
+---
+
+## 📚 Detailed Script Reference
+
+### Windows Scripts
+
+#### `install.ps1` (Interactive Menu)
+Master installer with menu-driven setup orchestration:
+- Beautiful colored menu interface with emoji status
+- Select individual scripts or run all
+- Proper error handling and progress tracking
+- Automatically handles PowerShell execution policy
+- Downloads scripts from GitHub on-the-fly (no manual cloning required)
+
+#### `windows_install.ps1` (74+ Applications)
+Comprehensive Windows setup script with:
+- **Automatic Chocolatey installation** if not present
+- **GPU detection** - Detects NVIDIA/AMD and installs appropriate drivers
+  - NVIDIA: Installs nvidia-app and nvidia-physx
+  - AMD: Prompts user to download drivers manually
+- **System restore point** created before applying tweaks
+- **Windows Privacy & Performance Tweaks**:
+  - Disables telemetry and diagnostic data collection
+  - Disables location tracking and Wi-Fi Sense
+  - Disables consumer features and app suggestions
+  - Disables GameDVR and Xbox features
+  - Disables cortana and feedback collection
+  - Enables "End Task" right-click on taskbar
+  - Runs disk cleanup
+  - Disables hibernation (saves SSD space)
+  - Disables storage sense optimization
+- **Oh My Posh Configuration**:
+  - Installs Oh My Posh with atomic theme
+  - Installs Nerd Fonts (FiraMono, FiraCode)
+  - Creates/backs up PowerShell profile
+- **PowerShell Modules**:
+  - PSReadLine (enhanced command-line editing)
+  - Terminal-Icons (file/folder icons in directory listings)
+
+**Runtime**: 20-60 minutes depending on internet speed
+
+#### `dev_setup.ps1` (Development Environment)
+Development environment setup with:
+- **WSL2 (Windows Subsystem for Linux) Installation**
+  - Installs WSL with Ubuntu
+  - Configures WSL resources and networking
+- **Docker Desktop Setup**
+  - Installs Docker Desktop via Chocolatey
+  - Enables Docker integration with WSL2
+- **Development Tools**:
+  - Node.js and npm package manager
+  - Python with pip and common packages (requests, flask, numpy, pandas)
+  - Git configuration (user.name, user.email, core.editor)
+- **AWS Configuration**
+  - AWS CLI installation and configuration
+  - AWS credentials setup with interactive prompts
+- **Version Control**:
+  - Git configuration
+  - GitHub CLI (gh) setup
+  - SSH key generation for GitHub
+- **Language SDKs**:
+  - Go installation and path setup
+  - Rust installation (via rustup)
+  - Java JDK installation
+
+**Runtime**: 30-45 minutes
+
+#### `privacy_tweaks.ps1` (Advanced Privacy)
+Comprehensive Windows privacy hardening (471 lines):
+- **Disables telemetry**: Diagnostic data, feedback collection, activity history
+- **Removes tracking**: Location services, Wi-Fi Sense, cloud-based speech recognition
+- **Disables spyware**: Cortana, Siri integration, consumer features
+- **Privacy policies**: Opts out of Windows privacy consent, personalization
+- **App diagnostics**: Disables app data collection
+- **Input privacy**: Disables text/handwriting data collection
+- **Start menu**: Removes app suggestions and tiles
+- **Network privacy**: Disables network suggestions
+- **General privacy**: Removes default user accounts, minimizes DISM data
+
+**Runtime**: 3-5 minutes
+
+#### `vscode_extensions.ps1` (50+ Extensions)
+Installs 50+ professionally-selected VS Code extensions
+
+**Runtime**: 10-15 minutes
+
+### macOS Scripts
+
+#### `install.sh` (Interactive Menu)
+Main entry point for setting up macOS:
+- Beautiful colored menu interface with emoji status
+- Select individual scripts or run all
+- Proper error handling and progress tracking
+- Automatically elevates to sudo when needed
+- Downloads scripts from GitHub on-the-fly (no manual cloning required)
+
+#### `brew_install.sh` (40+ Applications)
+Comprehensive Homebrew installation script with:
+- **Automatic Homebrew installation** if not present (handles Apple Silicon & Intel)
+- **Priority app installation** - Critical apps (1Password, Arc) installed first
+- **Smart ordering** - Smaller/faster apps first, heavy apps last for better user experience
+- **Idempotent design** - Safe to run multiple times without duplication
+- **Error handling** - Exits cleanly on any installation failure
+- **Colored output** with emoji status indicators
+- **CLI tools** (20+ formulae): bat, fzf, eza, btop, ripgrep, fd, jq, git-delta, etc.
+- **Oh My Zsh configuration** with Powerlevel10k, syntax highlighting, auto-suggestions
+- **Service management**: Disables auto-start for Docker, Ollama, VPNs
+
+**Runtime**: 5-10 minutes
+
+#### `mac_install.sh` (System Optimization)
+Comprehensive macOS customization and performance optimization:
+
+**Performance Enhancements:**
+- Disables Siri and Siri suggestions (reclaims system resources)
+- Disables Photos AI processing (stops memory/storage drain)
+- Disables Media AI features (eliminates background processing)
+- Disables Game Center and related services
+- Fixes macOS Sonoma lag issues
+- Optimizes launchd services
+
+**UI Speed Improvements:**
+- Instant window resize animations
+- Instant Dock appearance on hover
+- Removes all UI animation delays
+- Speeds up Mission Control and Exposé
+- Disables smooth scrolling delays
+- Faster screenshot saving
+
+**Dock & Finder Configuration:**
+- Auto-hide Dock (saves screen space)
+- Removes recents from Dock
+- Shows hidden files and file extensions
+- Enables path bar and status bar
+- Single-click proxy icons
+- Proper directory default views
+
+**Input & System Settings:**
+- Fast keyboard repeat rate
+- Trackpad gestures configuration
+- Modifier key mapping
+- Screen resolution optimization
+- Click speed adjustment
+- Hot corner configuration
+
+**Terminal & Shell:**
+- Nord theme installation (beautiful color scheme)
+- Oh My Zsh setup with plugins
+- Powerlevel10k prompt configuration
+- Syntax highlighting and auto-suggestions enabled
+
+**Runtime**: 2-3 minutes
+
+#### `vscode.sh` (68+ Extensions)
+Automated VS Code extension installation with categorized setup:
+
+**Categories**: AI, Themes, Languages, DevOps, Git, Data Science, Utilities, Gaming
+
+**Features:**
+- Colored progress output with statistics
+- Automatically skips already-installed extensions
+- Generates backup installation script
+- Shows total count and installation time
+- Requires VS Code CLI in PATH (automatically detected)
+
+**Runtime**: 5-10 minutes
+
+#### `privacy.sh` (Advanced Privacy Hardening)
+Comprehensive privacy and security hardening (831 lines):
+- **Framework**: Generated from [privacy.sexy](https://privacy.sexy) framework
+- **Comprehensive Siri disabling**: All Siri services, suggestions, and data collection
+- **Telemetry blocking**: Firefox, Microsoft Office, Homebrew, .NET Core, PowerShell
+- **System cleaning**: Cache clearing, DNS purging, Xcode cache, trash, logs
+- **Privacy features**: Location services, Bluetooth, accessibility permissions
+- **Security hardening**: Firewall configuration, remote access disabling, guest user removal
+- **iCloud settings**: Document storage, photo sync, keychain settings
+- **Advanced features**: System integrity protection checks, firmware updates, secure boot
+
+⚠️ **Note**: This is an advanced script with 831 lines of hardening rules. Review specific sections before running if you have concerns about compatibility with your workflow.
+
+**Runtime**: 5-10 minutes
+
+---
 
 ## 🎨 Customization
 
