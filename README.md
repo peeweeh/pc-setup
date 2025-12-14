@@ -49,6 +49,8 @@ Installs Visual Studio Code extensions
 
 ## 🍎 macOS Setup
 
+**Author**: [@mrfixit027](https://github.com/mrfixit027)
+
 ### 🚀 Interactive Installer (Recommended)
 
 **Run this command in Terminal** for an interactive menu:
@@ -57,68 +59,177 @@ Installs Visual Studio Code extensions
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
 ```
 
+The installer presents a beautiful colored menu where you can choose which components to install:
+
+```
+╔═══════════════════════════════════════════════════╗
+║   🍎 macOS Setup Script - Choose an Option       ║
+╚═══════════════════════════════════════════════════╝
+
+1) 📦 Install Applications (brew_install.sh)
+2) ⚙️  Optimize System (mac_install.sh)
+3) 🎨 Install VS Code Extensions (vscode.sh)
+4) 🔒 Privacy Hardening (privacy.sh)
+5) 🚀 Install ALL (recommended for fresh Mac)
+
+q) ❌ Quit
+```
+
 **Choose from:**
-1. **Install Applications** (brew_install.sh) - 40+ apps via Homebrew
-2. **Optimize System** (mac_install.sh) - Performance & UI tweaks
-3. **Install Extensions** (vscode.sh) - 68+ VS Code extensions
-4. **Privacy Hardening** (privacy.sh) - Advanced privacy settings
-5. **Install ALL** - Run all scripts in sequence
+- **Option 1** - Install 40+ applications via Homebrew
+- **Option 2** - Optimize system performance, UI speed, and battery life
+- **Option 3** - Install 68+ VS Code extensions
+- **Option 4** - Advanced privacy and security hardening
+- **Option 5** - Run all scripts in sequence (recommended for fresh Mac)
 
 ### Quick Start (Individual Scripts)
 
 **Just install apps:**
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/brew_install.sh)"
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/brew_install.sh)
 ```
 
 **Just optimize system:**
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_install.sh)"
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_install.sh)
 ```
 
-### Scripts
+**Just install VS Code extensions:**
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/vscode.sh)
+```
 
-#### `brew_install.sh`
+**Just harden privacy:**
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/privacy.sh)
+```
+
+### Scripts Overview
+
+#### `install.sh` (Interactive Menu)
+Main entry point for setting up macOS:
+- Beautiful colored menu interface with emoji status
+- Select individual scripts or run all
+- Proper error handling and progress tracking
+- Automatically elevates to sudo when needed
+- Downloads scripts from GitHub on-the-fly (no manual cloning required)
+
+#### `brew_install.sh` (40+ Applications)
 Comprehensive Homebrew installation script with:
-- **Automatic Homebrew installation** if not present
-- **Priority app installation** (1Password, Arc first)
-- **Smart ordering** - Fast apps first, heavy apps last
-- **Idempotent** - Safe to run multiple times
-- **Error handling** and colored output
-- 40+ applications including:
-  - Development tools (Git, VS Code, Docker, Postman, Warp)
-  - Browsers (Chrome, Brave, Arc)
-  - Communication (Slack, Teams, Discord, Signal, WhatsApp)
-  - Utilities (1Password, Rectangle, Raycast, BetterMouse)
-  - CLI tools (bat, fzf, eza, btop, go, node, ollama)
+- **Automatic Homebrew installation** if not present (handles Apple Silicon & Intel)
+- **Priority app installation** - Critical apps (1Password, Arc) installed first
+- **Smart ordering** - Smaller/faster apps first, heavy apps last for better user experience
+- **Idempotent design** - Safe to run multiple times without duplication
+- **Error handling** - Exits cleanly on any installation failure
+- **Colored output** with emoji status indicators
 
-#### `mac_install.sh`
-System optimization and customization script with:
-- **Performance & Battery Optimization** - Disables Siri, Photos AI, Media AI, Game Center
-- **UI Speed Improvements** - Instant animations, faster Mission Control, no delays
-- **Dock Configuration** - Auto-hide, clean layout, no recent apps
-- **Finder Customization** - Show hidden files, extensions, path bar, status bar
-- **System Preferences** - Fast keyboard, trackpad gestures, security settings
-- **Terminal Theme** - Nord theme installation
-- Includes all optimizations from the performance tweaks table
+**Applications installed:**
+- **Essentials**: 1Password, Arc, Google Chrome, Brave, VS Code, Docker
+- **Development**: Git, AWS CLI, Postman, Warp, Node.js, Go, Python, Ollama
+- **Communication**: Slack, Teams, Discord, Signal, WhatsApp, Zoom
+- **Utilities**: Rectangle, Raycast, BetterMouse, Finder enhancements
+- **CLI Tools**: bat, fzf, eza, btop, jq, ripgrep, exa
+- **Configuration**: Oh My Zsh with Powerlevel10k, syntax highlighting, auto-suggestions
+- **Service Management**: Disables auto-start for Docker, Ollama, VPNs
 
-#### `vscode.sh`
-Installs 68+ VS Code extensions organized by category:
-- AI assistants (GitHub Copilot, Amazon Q, Claude)
-- Themes and icons
-- Language support (Python, JavaScript, Go, GraphQL)
-- DevOps tools (Docker, Kubernetes, Terraform)
-- Git tools (GitLens, Git History)
-- With colored output and progress tracking
+#### `mac_install.sh` (System Optimization)
+Comprehensive macOS customization and performance optimization:
 
-#### `privacy.sh`
-Advanced privacy and security hardening (831 lines):
-- **Comprehensive Siri disabling** - All Siri services and data collection
-- **Telemetry disabling** - Firefox, Office, Homebrew, .NET Core, PowerShell
-- **Cache clearing** - System, user, CUPS, DNS, Xcode
-- **Privacy hardening** - Firewall, remote access, location services
-- **iCloud settings** - Document storage, sync preferences
-- ⚠️ **Note**: This is an advanced script. Review before running.
+**Performance Enhancements:**
+- Disables Siri and Siri suggestions (reclaims system resources)
+- Disables Photos AI processing (stops memory/storage drain)
+- Disables Media AI features (eliminates background processing)
+- Disables Game Center and related services
+- Fixes macOS Sonoma lag issues
+- Optimizes launchd services
+
+**UI Speed Improvements:**
+- Instant window resize animations
+- Instant Dock appearance on hover
+- Removes all UI animation delays
+- Speeds up Mission Control and Exposé
+- Disables smooth scrolling delays
+- Faster screenshot saving
+
+**Dock & Finder Configuration:**
+- Auto-hide Dock (saves screen space)
+- Removes recents from Dock
+- Shows hidden files and file extensions
+- Enables path bar and status bar
+- Single-click proxy icons
+- Proper directory default views
+
+**Input & System Settings:**
+- Fast keyboard repeat rate
+- Trackpad gestures configuration
+- Modifier key mapping
+- Screen resolution optimization
+- Click speed adjustment
+- Hot corner configuration
+
+**Terminal & Shell:**
+- Nord theme installation (beautiful color scheme)
+- Oh My Zsh setup with plugins
+- Powerlevel10k prompt configuration
+- Syntax highlighting and auto-suggestions enabled
+
+#### `vscode.sh` (68+ Extensions)
+Automated VS Code extension installation with categorized setup:
+
+**AI & Productivity:**
+- GitHub Copilot, Amazon Q, Claude (Anthropic)
+- Tabnine, Continue Dev
+
+**Visual Themes:**
+- Nord, Dracula, One Dark, Material Icon Theme
+- Icons, Nerd Font icons
+
+**Language Support:**
+- Python, JavaScript/TypeScript, Go, GraphQL
+- Rust, C/C++, Java, SQL
+
+**DevOps & Infrastructure:**
+- Docker, Kubernetes, Terraform
+- AWS Toolkit, CloudFormation
+- Azure Tools, Google Cloud Code
+
+**Git & Version Control:**
+- GitLens, Git History, Git Graph
+- GitHub Copilot (for PR reviews)
+
+**Development Tools:**
+- Jupyter, REST Client, Thunder Client
+- Prettier, ESLint, Pylint
+- Postman
+
+**Utilities:**
+- Markdown Preview, Better Comments
+- Code Spell Checker, Peacock
+- Error Lens, Peacock Favorites
+- Todo Tree, Bookmarks
+
+**Gaming Mods:**
+- Minecraft tools, Game Modding support
+
+**Features:**
+- Colored progress output with statistics
+- Automatically skips already-installed extensions
+- Generates backup installation script (InstallVsCodeExtensions.sh)
+- Shows total count and installation time
+- Requires VS Code CLI in PATH (automatically detected)
+
+#### `privacy.sh` (Advanced Privacy Hardening)
+Comprehensive privacy and security hardening (831 lines):
+- **Framework**: Generated from [privacy.sexy](https://privacy.sexy) framework
+- **Comprehensive Siri disabling**: All Siri services, suggestions, and data collection
+- **Telemetry blocking**: Firefox, Microsoft Office, Homebrew, .NET Core, PowerShell
+- **System cleaning**: Cache clearing, DNS purging, Xcode cache, trash, logs
+- **Privacy features**: Location services, Bluetooth, accessibility permissions
+- **Security hardening**: Firewall configuration, remote access disabling, guest user removal
+- **iCloud settings**: Document storage, photo sync, keychain settings
+- **Advanced features**: System integrity protection checks, firmware updates, secure boot
+
+⚠️ **Note**: This is an advanced script with 831 lines of hardening rules. Review specific sections before running if you have concerns about compatibility with your workflow.
 
 ## 📦 Prerequisites
 
