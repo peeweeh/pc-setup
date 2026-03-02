@@ -11,6 +11,18 @@ echo -e "${CYAN}Author: mrfixit027 | https://github.com/peeweeh/pc-setup${NC}\n"
 set -e  # Exit on error
 set -u  # Exit on undefined variable
 
+# ── Sudo keep-alive ─────────────────────────────────────────────────────────────
+# Some cask installs need sudo (e.g. microsoft-office, docker-desktop).
+# Ask once upfront and keep the session alive in the background.
+echo ""
+echo -e "\033[1;33m[NOTE]\033[0m Some Homebrew casks require sudo. Enter your password once now"
+echo -e "       and it will be kept alive for the rest of the install.\n"
+sudo -v
+# Background loop: refresh sudo timestamp every 50s until this script exits
+while true; do sudo -n true; sleep 50; kill -0 "$$" || exit; done 2>/dev/null &
+SUDO_KEEPALIVE_PID=$!
+trap 'kill $SUDO_KEEPALIVE_PID 2>/dev/null' EXIT
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -49,34 +61,26 @@ print_info "Updating Homebrew..."
 brew update
 brew upgrade
 
-# Install essential applications first
-print_info "Installing applications..."
+# ── App Tiers ───────────────────────────────────────────────────────────────────
+#   Essential    = core utilities + web-dev tools (always included)
+#   Productivity = Essential + browsers, comms, productivity (no heavy stuff)
+#   Everything   = all of the above + office, cloud, enterprise, heavy apps
 
-apps=(
-  # Priority installs - small and essential
+# ── Tier 1: Essential ───────────────────────────────────────────────────────────
+essential_apps=(
+  # Core utilities
   1password
-  arc
-  
-  # Quick installs - utilities and lightweight apps
   1password-cli
-  alfred
+  arc
+  comet
   bettermouse
   clipy
   moom
   rectangle
   raycast
   the-unarchiver
-  
-  # Medium size apps - browsers and communication
-  brave-browser
-  google-chrome
-  signal
-  telegram
-  whatsapp
-  discord
-  slack
-  
-  # Development tools - moderate size
+
+  # Dev tools
   github
   postman
   sourcetree
@@ -84,43 +88,110 @@ apps=(
   warp
   fig
   devtoys
-  
-  # Larger productivity apps
+  gh
+  copilot-cli
+
+  # Python linters / formatters
+  ruff
+  vulture
+  black
+  isort
+  flake8
+  docker-desktop
+)
+
+# ── Tier 2: Productivity (adds on top of Essential) ────────────────────────────
+productivity_apps=(
+  # Browsers
+  brave-browser
+  google-chrome
+
+  # Communication
+  signal
+  telegram
+  whatsapp
+  discord
+  slack
+  beeper
+
+  # Productivity
   chatgpt
   claude
-  evernote
   obsidian
-  toggl
   vlc
   zoom
-  beeper
-  
-  # Heavy installs - office suites and complex apps
-  microsoft-office
-  microsoft-teams
-  microsoft-remote-desktop
-  
-  # VPN and cloud storage - can be slow to download
+)
+
+# ── Tier 3: Everything (adds on top of Productivity) ───────────────────────────
+everything_apps=(
+  # Cloud & VPN
   protonvpn
   proton-mail
   proton-drive
   google-drive
   onedrive
-  
-  # Enterprise and specialized apps - slower installs
-  amazon-chime
+
+  # Microsoft Office
+  microsoft-office
+  microsoft-teams
+  microsoft-remote-desktop
+
+  # Enterprise
   amazon-workspaces
+
+  # Heavy / large installs
   
-  # Very large applications - install last
-  docker-desktop
   figma
   home-assistant
   istat-menus
   steam
 )
 
-# Install applications using Homebrew Cask
-for app in "${apps[@]}"; do
+# ── Installation Mode Selection ─────────────────────────────────────────────────
+echo ""
+echo -e "${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║          Choose What to Install                            ║${NC}"
+echo -e "${GREEN}╠══════════════════════════════════════════════════════════════╣${NC}"
+echo -e "${GREEN}║                                                            ║${NC}"
+echo -e "${GREEN}║  1) Essential      – Dev tools & core utilities            ║${NC}"
+echo -e "${GREEN}║     1password, arc, vscode, raycast, postman, etc.        ║${NC}"
+echo -e "${GREEN}║     (~25 apps, ~5 min)                                     ║${NC}"
+echo -e "${GREEN}║                                                            ║${NC}"
+echo -e "${GREEN}║  2) Productivity   – Essential + browsers & comms          ║${NC}"
+echo -e "${GREEN}║     + chrome, brave, slack, discord, obsidian, zoom        ║${NC}"
+echo -e "${GREEN}║     (~40 apps, ~15-20 min)                                 ║${NC}"
+echo -e "${GREEN}║                                                            ║${NC}"
+echo -e "${GREEN}║  3) Everything     – All 50+ apps                          ║${NC}"
+echo -e "${GREEN}║     + office, cloud, docker, figma, steam, etc.           ║${NC}"
+echo -e "${GREEN}║     (~50+ apps, ~30-60 min)                                ║${NC}"
+echo -e "${GREEN}║                                                            ║${NC}"
+echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
+echo ""
+
+while true; do
+  read -rp "Enter choice [1, 2, or 3]: " install_mode
+  case "$install_mode" in
+    1|2|3) break ;;
+    *) print_warning "Please enter 1, 2, or 3" ;;
+  esac
+done
+
+# Build the final app list (tiers are cumulative)
+apps_to_install=("${essential_apps[@]}")
+
+if [[ "$install_mode" -ge 2 ]]; then
+  apps_to_install+=("${productivity_apps[@]}")
+fi
+
+if [[ "$install_mode" -ge 3 ]]; then
+  apps_to_install+=("${everything_apps[@]}")
+fi
+
+echo ""
+print_info "Installing ${#apps_to_install[@]} applications..."
+
+# Install selected applications using Homebrew Cask
+for app in "${apps_to_install[@]}"; do
   if brew list --cask | grep -q "^${app}\$"; then
     print_warning "$app is already installed, skipping..."
   else

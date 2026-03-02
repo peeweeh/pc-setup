@@ -39,8 +39,6 @@ print_header() {
 # VS Code extensions organized by category
 vscodeExtensions=(
     # AI & Coding Assistants
-    "amazonwebservices.amazon-q-vscode"
-    "github.copilot"
     "github.copilot-chat"
     "saoudrizwan.claude-dev"
     
@@ -49,60 +47,48 @@ vscodeExtensions=(
     "ahmadawais.shades-of-purple"
     "enkia.tokyo-night"
     "liviuschera.noctis"
-    "zhuangtongfa.material-theme"
     "vscode-icons-team.vscode-icons"
     
     # AWS & Cloud
-    "amazonwebservices.aws-toolkit-vscode"
     "4ops.terraform"
-    "hashicorp.terraform"
-    "aws-scripting-guy.cform"
-    "kddejong.vscode-cfn-lint"
     
     # Code Quality & Formatting
     "adpyke.codesnap"
-    "chakrounanas.turbo-console-log"
-    "davidanson.vscode-markdownlint"
     "dbaeumer.vscode-eslint"
     "dzhavat.bracket-pair-toggler"
+    "esbenp.prettier-vscode"
     "formulahendry.auto-close-tag"
-    "wix.vscode-import-cost"
+    "rvest.vs-code-prettier-eslint"
     
     # Git & Version Control
     "donjayamanne.githistory"
-    "eamodio.gitlens"
     "atlassian.atlascode"
+    "github.vscode-pull-request-github"
     
     # Languages - Python
     "ms-python.autopep8"
     "ms-python.debugpy"
+    "ms-python.flake8"
     "ms-python.isort"
+    "ms-python.mypy-type-checker"
+    "ms-python.pylint"
     "ms-python.python"
     "ms-python.vscode-pylance"
     "ms-python.vscode-python-envs"
     
     # Languages - JavaScript/React
     "bradlc.vscode-tailwindcss"
-    "burkeholland.simple-react-snippets"
     "dsznajder.es7-react-js-snippets"
-    
-    # Languages - Go
-    "golang.go"
+    "heybourn.headwind"
     
     # Languages - GraphQL
     "graphql.vscode-graphql"
     "graphql.vscode-graphql-execution"
     "graphql.vscode-graphql-syntax"
-    "micheldiz.vscode-dgraph-snippets"
-    "mquandalle.graphql"
     
     # Containers & DevOps
     "docker.docker"
-    "ms-azuretools.vscode-containers"
-    "ms-vscode-remote.remote-containers"
     "ms-vscode-remote.remote-wsl"
-    "ms-kubernetes-tools.vscode-kubernetes-tools"
-    "tchoupinax.tilt"
     "github.vscode-github-actions"
     "mindaro-dev.file-downloader"
     
@@ -117,23 +103,19 @@ vscodeExtensions=(
     "bierner.markdown-preview-github-styles"
     "yzhang.markdown-all-in-one"
     
+    # Database
+    "dbcode.dbcode"
+    
+    # API Testing
+    "rangav.vscode-thunder-client"
+    
     # Utilities
     "ms-edgedevtools.vscode-edge-devtools"
-    "ms-vscode.powershell"
-    "ms-vsliveshare.vsliveshare"
     "phu1237.vs-browser"
     "redhat.vscode-yaml"
     "supperchong.pretty-json"
     "dotjoshjohnson.xml"
     "github.codespaces"
-    
-    # Gaming/Modding (Paradox)
-    "dragon-archer.paradox-highlight"
-    "jakobharder.anno-modding-tools"
-    "n1nja.ck2"
-    "tboby.cwtools-vscode"
-    "tboby.paradox-syntax"
-    "unlomtrois.ck3tiger-for-vscode"
 )
 
 print_header "VS Code Extensions Installation"

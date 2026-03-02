@@ -832,6 +832,146 @@ fi
 # ----------------------------------------------------------
 
 
+# ----------------------------------------------------------
+# ----------Disable sending diagnostics to Apple------------
+# ----------------------------------------------------------
+echo '--- Disable sending diagnostics to Apple'
+sudo defaults write /Library/Application\ Support/CrashReporter/DiagnosticMessagesHistory.plist AutoSubmit -bool false
+sudo defaults write /Library/Application\ Support/CrashReporter/DiagnosticMessagesHistory.plist AutoSubmitVersion -int 4
+defaults write com.apple.CrashReporter DialogType -string none
+defaults write com.apple.CrashReporter UseUNC -bool false
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# -------Disable Apple diagnostics & usage analytics--------
+# ----------------------------------------------------------
+echo '--- Disable Apple diagnostics & usage analytics'
+defaults write com.apple.privacy.policyreporter sendDiagnostics -bool false
+defaults write com.apple.SubmitDiagInfo AutoSubmit -bool false
+defaults write com.apple.SubmitDiagInfo AutoSubmitVersion -int 4
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# -----------Disable iCloud analytics data sharing----------
+# ----------------------------------------------------------
+echo '--- Disable iCloud analytics data sharing'
+defaults write com.apple.CloudDocs.container-metadata shareAnalyticsWithApple -bool false
+defaults write com.apple.icloud.fmipcore ICFShareMyLocationEnabled -bool false
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# ----------Disable Spotlight search data collection--------
+# ----------------------------------------------------------
+echo '--- Disable Spotlight search data collection'
+# Prevent Spotlight from sending queries to Apple/third parties
+defaults write com.apple.spotlight orderedItems -array \
+    '{"enabled" = 0;"name" = "INTERNET_ENABLED";}' \
+    '{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' \
+    '{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
+# Disable Spotlight universal search (phone-home)
+sudo defaults write /Library/Preferences/com.apple.commerce.plist AutoDownload -bool false
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# ----Disable Safari telemetry, suggestions & prefetching---
+# ----------------------------------------------------------
+echo '--- Disable Safari telemetry, suggestions & prefetching'
+defaults write com.apple.Safari UniversalSearchEnabled -bool false
+defaults write com.apple.Safari SuppressSearchSuggestions -bool true
+defaults write com.apple.Safari PreloadTopHit -bool false
+defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
+defaults write com.apple.Safari WebKitPreferences.privateClickMeasurementEnabled -bool false
+defaults write com.apple.Safari SafariGeolocationPermissionPolicy -int 0
+defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically -bool false
+# Prevent Safari from reading fraudulent website warnings (sends URLs to Apple/Google)
+defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool false
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# -------Disable Handoff & Universal Clipboard/AirDrop------
+# ----------------------------------------------------------
+echo '--- Disable Handoff & Universal Clipboard'
+defaults write com.apple.coreduetd.overrides DeferSystemIdleSystemSleepWhileLockedEnabled -int 0
+defaults write ~/Library/Preferences/ByHost/com.apple.coreduetd.plist ActivityAdvertisingAllowed -bool false
+defaults write ~/Library/Preferences/ByHost/com.apple.coreduetd.plist ActivityReceivingAllowed -bool false
+defaults write com.apple.ApplicationActivationPolicy.plist com.apple.sharingd -bool false
+# Disable Handoff
+defaults write com.apple.coreduetd.overrides HandoffEnabled -bool false
+defaults write "com.apple.ActivityContinuation" "ActivityContinuationEnabled" -bool false
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# ------------Disable location services (system)------------
+# ----------------------------------------------------------
+echo '--- Disable location services'
+sudo defaults write /var/db/locationd/Library/Preferences/ByHost/com.apple.locationd LocationServicesEnabled -bool false
+sudo launchctl disable 'system/com.apple.locationd'
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# --------Disable Personalized Ads & Tracking consent-------
+# ----------------------------------------------------------
+echo '--- Disable personalized recommendations & tracking consent prompts'
+defaults write com.apple.SetupAssistant.managed SkipPrivacySetup -bool true
+defaults write com.apple.privacy PrivacyUpdate -int 2
+defaults write com.apple.assistant.support 'Search Queries Data Sharing Status' -int 2
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# --------Disable Screen Time analytics reporting-----------
+# ----------------------------------------------------------
+echo '--- Disable Screen Time analytics reporting'
+defaults write com.apple.screentime EnabledState -int 0
+defaults write com.apple.screentime SCAppUseDurationEnabled -bool false
+defaults write com.apple.screentime SCScreenTimeEnabled -bool false
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# ----------Disable NetBIOS (leaks hostname/network)--------
+# ----------------------------------------------------------
+echo '--- Disable NetBIOS'
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string ''
+sudo launchctl disable 'system/com.apple.netbiosd'
+sudo launchctl bootout system /System/Library/LaunchDaemons/com.apple.netbiosd.plist 2>/dev/null || true
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# ------------------Clear Recent Items----------------------
+# ----------------------------------------------------------
+echo '--- Clear recent items (apps, documents, servers)'
+defaults write com.apple.recentitems RecentApplications -array
+defaults write com.apple.recentitems RecentDocuments -array
+defaults write com.apple.recentitems RecentServers -array
+osascript -e 'tell application "System Events" to set the recent documents list to {}'
+osascript -e 'tell application "System Events" to set the recent applications list to {}'
+osascript -e 'tell application "System Events" to set the recent servers list to {}'
+# Set recent items to 0 in System Settings
+defaults write -g NSRecentDocumentsLimit -int 0
+defaults write com.apple.LSSharedFileList.RecentDocuments MaxAmount -int 0
+defaults write com.apple.LSSharedFileList.RecentApplications MaxAmount -int 0
+# ----------------------------------------------------------
+
+
+# ----------------------------------------------------------
+# -------Disable wake for network access / Power Nap--------
+# ----------------------------------------------------------
+echo '--- Disable wake for network access and Power Nap'
+sudo pmset -a womp 0
+sudo pmset -a darkwakes 0
+sudo pmset -a powernap 0
+# ----------------------------------------------------------
+
+
 echo 'Your privacy and security is now hardened 🎉💪'
 echo 'Press any key to exit.'
 read -n 1 -s

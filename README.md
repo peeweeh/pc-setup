@@ -54,7 +54,7 @@ Both open interactive menus with 5 options:
 
 ### macOS
 - **Interactive Installer** - Menu-driven setup with 5 options (Apps, Optimize, VS Code, Privacy, All)
-- **Homebrew Package Installation** - 40+ essential applications and 20+ CLI tools
+- **Homebrew Package Installation** - 3 tiers: Essential / Productivity / Everything + 20+ CLI tools
 - **System Optimization** - Performance, battery, and UI speed improvements
 - **Disables Siri, Photos AI, Media AI** - Significant battery savings
 - **Privacy Hardening** - Comprehensive 831-line privacy configuration
@@ -455,19 +455,22 @@ Main entry point for setting up macOS:
 - Automatically elevates to sudo when needed
 - Downloads scripts from GitHub on-the-fly (no manual cloning required)
 
-#### `brew_install.sh` (40+ Applications)
+#### `brew_install.sh` (50+ Applications)
 Comprehensive Homebrew installation script with:
 - **Automatic Homebrew installation** if not present (handles Apple Silicon & Intel)
-- **Priority app installation** - Critical apps (1Password, Arc) installed first
-- **Smart ordering** - Smaller/faster apps first, heavy apps last for better user experience
+- **Three install tiers** (cumulative):
+  - **Essential** (~25 apps) – Dev tools & core utilities (1password, arc, vscode, raycast, postman, etc.)
+  - **Productivity** (~40 apps) – + browsers, comms, productivity (chrome, slack, obsidian, zoom, etc.)
+  - **Everything** (50+ apps) – + office, cloud/VPN, enterprise, heavy apps (docker, figma, steam, etc.)
+- **Sudo keep-alive** – Password asked once; background loop refreshes it automatically
 - **Idempotent design** - Safe to run multiple times without duplication
 - **Error handling** - Exits cleanly on any installation failure
-- **Colored output** with emoji status indicators
-- **CLI tools** (20+ formulae): bat, fzf, eza, btop, ripgrep, fd, jq, git-delta, etc.
+- **Colored output** with status indicators
+- **CLI tools** (20+ formulae): bat, fzf, eza, btop, git, awscli, docker, etc.
 - **Oh My Zsh configuration** with Powerlevel10k, syntax highlighting, auto-suggestions
 - **Service management**: Disables auto-start for Docker, Ollama, VPNs
 
-**Runtime**: 5-10 minutes
+**Runtime**: ~5 min (Essential) / ~15-20 min (Productivity) / ~30-60 min (Everything)
 
 #### `mac_install.sh` (System Optimization)
 Comprehensive macOS customization and performance optimization:
