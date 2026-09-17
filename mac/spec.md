@@ -118,7 +118,7 @@ Fast plus the heavier/slower items.
 
 **Fast tier**:
 - Core utilities: 1Password, Arc, Comet, BetterMouse, Clipy, Moom, Rectangle, Raycast, The Unarchiver
-- Dev tools: GitHub Desktop, Postman, Sourcetree, VS Code, Warp, Fig, DevToys, Copilot CLI
+- Dev tools: GitHub Desktop, Postman, Sourcetree, VS Code, Warp, DevToys, Copilot CLI
 - Browsers: Brave, Google Chrome
 - Communication: Signal, Telegram, WhatsApp, Discord, Slack, Beeper
 - Productivity: ChatGPT, Claude, Obsidian, VLC, Zoom

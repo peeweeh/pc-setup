@@ -324,7 +324,7 @@ chmod +x *.sh
 - Visual Studio Code
 - Docker
 - Postman
-- Fig, DevToys
+- DevToys
 
 #### Browsers
 - Google Chrome, Brave
@@ -450,7 +450,7 @@ Main entry point for setting up macOS:
 Comprehensive Homebrew installation script with:
 - **Automatic Homebrew installation** if not present (handles Apple Silicon & Intel)
 - **Two install tiers**:
-  - **Fast** (~31 apps) – Dev tools, browsers, comms & productivity (1password, arc, vscode, raycast, chrome, slack, etc.)
+  - **Fast** (~30 apps) – Dev tools, browsers, comms & productivity (1password, arc, vscode, raycast, chrome, slack, etc.)
   - **Slow** (~14 more apps) – Fast + Office, Docker, cloud/VPN, and other large/slow installs (figma, steam, docker-desktop, etc.)
 - **Sudo keep-alive** – Password asked once; background loop refreshes it automatically
 - **Idempotent design** - Safe to run multiple times without duplication

@@ -75,7 +75,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 **Features:**
 - **Automatic Homebrew installation** if not present (includes Apple Silicon PATH setup)
 - **Two install tiers**, prompted interactively (Slow includes everything in Fast plus more):
-  - **Fast** (~31 apps): 1Password, Arc, Comet, BetterMouse, Clipy, Moom, Rectangle,
+  - **Fast** (~30 apps): 1Password, Arc, Comet, BetterMouse, Clipy, Moom, Rectangle,
     Raycast, The Unarchiver, GitHub Desktop, Postman, Sourcetree, VS Code, Warp, Fig,
     DevToys, Copilot CLI, Brave, Google Chrome, Signal, Telegram, WhatsApp, Discord,
     Slack, Beeper, ChatGPT, Claude, Obsidian, VLC, Zoom

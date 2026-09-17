@@ -142,7 +142,6 @@ fast_apps=(
   sourcetree
   visual-studio-code
   warp
-  fig
   devtoys
   copilot-cli
 
@@ -199,11 +198,11 @@ echo -e "${GREEN}╠════════════════════
 echo -e "${GREEN}║                                                            ║${NC}"
 echo -e "${GREEN}║  1) Fast   – Dev tools, browsers, comms, productivity      ║${NC}"
 echo -e "${GREEN}║     1password, arc, vscode, raycast, chrome, slack, etc.  ║${NC}"
-echo -e "${GREEN}║     (~40 apps, ~15-20 min)                                 ║${NC}"
+echo -e "${GREEN}║     (~30 apps, ~15-20 min)                                 ║${NC}"
 echo -e "${GREEN}║                                                            ║${NC}"
 echo -e "${GREEN}║  2) Slow   – Fast + Office, Docker, cloud, and other       ║${NC}"
 echo -e "${GREEN}║     large/slow installs (figma, steam, VPNs, etc.)        ║${NC}"
-echo -e "${GREEN}║     (~55+ apps, ~40-70 min)                                ║${NC}"
+echo -e "${GREEN}║     (~44 apps, ~40-70 min)                                 ║${NC}"
 echo -e "${GREEN}║                                                            ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
 echo ""
