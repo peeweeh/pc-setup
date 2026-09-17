@@ -296,17 +296,25 @@ fi
 # correctly instead of showing as "[?]" tofu boxes. Hack Nerd Font is preferred (falls
 # back to Fira Code Nerd Font if Hack isn't present, e.g. brew_install.sh wasn't run,
 # or install failed).
-NERD_FONT="HackNerdFontMono-Regular"
-if [[ ! -f "$HOME/Library/Fonts/${NERD_FONT}.ttf" ]] && [[ ! -f "/Library/Fonts/${NERD_FONT}.ttf" ]]; then
-  NERD_FONT="FiraCodeNerdFontMono-Regular"
+#
+# IMPORTANT: Terminal.app's AppleScript "font name" property requires the font's actual
+# PostScript name (e.g. "HackNFM-Regular"), NOT the .ttf filename (e.g.
+# "HackNerdFontMono-Regular") - passing the filename fails silently (no error, font just
+# doesn't change). Use `system_profiler SPFontsDataType` on the .ttf to find the correct
+# PostScript name if these fonts are ever updated/renamed upstream.
+NERD_FONT_FILE="HackNerdFontMono-Regular"
+NERD_FONT_PSNAME="HackNFM-Regular"
+if [[ ! -f "$HOME/Library/Fonts/${NERD_FONT_FILE}.ttf" ]] && [[ ! -f "/Library/Fonts/${NERD_FONT_FILE}.ttf" ]]; then
+  NERD_FONT_FILE="FiraCodeNerdFontMono-Regular"
+  NERD_FONT_PSNAME="FiraCodeNFM-Reg"
 fi
 
-if [[ -f "$HOME/Library/Fonts/${NERD_FONT}.ttf" ]] || [[ -f "/Library/Fonts/${NERD_FONT}.ttf" ]]; then
-  print_info "Applying Nerd Font '${NERD_FONT}' to your current profile ('${CURRENT_DEFAULT_PROFILE}') - theme/colors untouched..."
+if [[ -f "$HOME/Library/Fonts/${NERD_FONT_FILE}.ttf" ]] || [[ -f "/Library/Fonts/${NERD_FONT_FILE}.ttf" ]]; then
+  print_info "Applying Nerd Font '${NERD_FONT_FILE}' to your current profile ('${CURRENT_DEFAULT_PROFILE}') - theme/colors untouched..."
   if osascript <<OSA
 tell application "Terminal"
   try
-    set font name of settings set "${CURRENT_DEFAULT_PROFILE}" to "${NERD_FONT}"
+    set font name of settings set "${CURRENT_DEFAULT_PROFILE}" to "${NERD_FONT_PSNAME}"
     set font size of settings set "${CURRENT_DEFAULT_PROFILE}" to 13
   end try
 end tell

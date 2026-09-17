@@ -219,6 +219,14 @@ for font in "${fonts[@]}"; do
   fi
 done
 
+# Some cask font installs leave a com.apple.quarantine flag on the .ttf files, which
+# prevents macOS from actually registering/enabling them (they sit on disk but never
+# show up as usable fonts in Terminal/Font Book). Strip it defensively.
+if [[ -d "$HOME/Library/Fonts" ]]; then
+  find "$HOME/Library/Fonts" \( -iname "*fira*code*" -o -iname "*hack*nerd*" \) -print0 2>/dev/null \
+    | xargs -0 xattr -d com.apple.quarantine 2>/dev/null || true
+fi
+
 
 # Install Oh My Zsh BEFORE we customize .zshrc below. Its installer replaces ~/.zshrc
 # with its own default template (backing up any existing file), so it must run first -
