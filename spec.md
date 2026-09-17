@@ -12,10 +12,8 @@ The PC Setup project provides modular, automated setup scripts for Windows and m
 
 1. **install.sh** (Interactive Menu) - Choose which scripts to run
    - **Option 1**: brew_install.sh - Install 40+ applications (required)
-   - **Option 2**: mac_install.sh - Performance & UI optimization (recommended)
-   - **Option 3**: vscode.sh - Install 68+ VS Code extensions (optional)
-   - **Option 4**: privacy.sh - Advanced privacy hardening (optional)
-   - **Option 5**: All of the above (best for fresh Mac)
+   - **Option 2**: mac_optimize.sh - Performance, UI & privacy hardening (recommended)
+   - **Option 3**: All of the above (best for fresh Mac)
 
 ### Windows Execution Order (Recommended)
 
@@ -36,9 +34,9 @@ The PC Setup project provides modular, automated setup scripts for Windows and m
 
 **Features:**
 - Beautiful colored menu interface with emoji status indicators
-- 5 installation options: Applications, System Optimization, VS Code, Privacy, or All
+- 3 installation options: Applications, System Optimization + Privacy, or All
 - Downloads scripts dynamically from GitHub (no pre-cloning required)
-- Proper sudo elevation for privacy.sh
+- Proper sudo elevation for mac_optimize.sh
 - Progress tracking with colored output (✓ ✗ ⚠)
 - Comprehensive error handling
 - Clean temporary file management
@@ -46,10 +44,8 @@ The PC Setup project provides modular, automated setup scripts for Windows and m
 **Menu Options:**
 ```
 1️⃣  Install Applications (brew_install.sh) - 40+ apps via Homebrew
-2️⃣  Optimize System (mac_install.sh) - Performance, battery, UI tweaks  
-3️⃣  Install VS Code Extensions (vscode.sh) - 68+ extensions
-4️⃣  Privacy Hardening (privacy.sh) - Advanced privacy settings
-5️⃣  Install ALL - Run all scripts in sequence
+2️⃣  Optimize System & Harden Privacy (mac_optimize.sh) - Performance, UI & privacy tweaks
+3️⃣  Install ALL - Run all scripts in sequence
 ```
 
 **Execution:**
@@ -160,15 +156,24 @@ chmod +x brew_install.sh
   - ⚠ (YELLOW) - Already installed, skipping
 - Shows progress for each package
 - Final summary with completion time
-- Next step suggestion (run mac_install.sh for optimization)
+- Next step suggestion (run mac_optimize.sh for optimization & privacy hardening)
 
 ---
 
-### 1.3 mac_install.sh (System Optimization)
+### 1.3 mac_optimize.sh (System Optimization & Privacy Hardening)
 
-**Purpose:** Comprehensive macOS customization for performance, battery life, and UI speed.
+**Purpose:** Comprehensive macOS customization for performance, battery life, UI speed,
+and privacy/security hardening. This script combines what were previously two separate
+scripts (`mac_install.sh` and `privacy.sh`) into one.
 
-**Location**: `/mac/mac_install.sh`
+**Location**: `/mac/mac_optimize.sh`
+
+**⚠️ WARNING:** This is an advanced script with extensive system changes (800+ lines).
+Review specific sections before running if you have concerns. Individual commands elevate
+with `sudo` as needed - run the script as your normal user, not with `sudo` in front of it.
+
+**Author/Source**: Performance/UI portions are original; privacy/security portions are
+generated from the [privacy.sexy](https://privacy.sexy) framework.
 
 **Features:**
 
@@ -176,8 +181,7 @@ chmod +x brew_install.sh
 - **Disables Photos AI analysis** - Prevents facial recognition, object detection (major battery saver)
 - **Disables Media AI** - Stops video scene detection and indexing
 - **Disables Game Center** - Removes unused gaming service
-- **Fixes macOS Sonoma lag** - Addresses 26-second heuristic lag bug
-- **Optimizes Electron apps** - Disables unnecessary GPU usage in Chrome, Slack, VS Code
+- **Optimizes Electron apps** - Disables unnecessary GPU usage in Chrome, Slack, etc
 - **Disables crash reporter** - Removes intrusive dialogs
 - **Memory optimization** - Clears inactive memory cache
 
@@ -229,206 +233,6 @@ chmod +x brew_install.sh
 - **Nord Terminal theme** - Beautiful, easy-on-eyes color scheme
 - **Proper PATH setup** - Ensures correct shell command resolution
 
-**Requirements:**
-- macOS 10.15 or later
-- Administrator privileges (sudo) for system changes
-- Logout/restart may be required for full effect
-- ~2-3 minutes runtime
-
-**Execution Options:**
-
-Via interactive installer:
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
-# Select option 2
-```
-
-Direct installation:
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_install.sh)
-```
-
-**Output:**
-- Section headers (Performance, UI Speed, Dock, Finder, etc)
-- Color-coded completion messages
-- Summary of all changes made
-- Recommendation to restart computer
-
-**Related:**
-- For comprehensive Siri disabling and privacy hardening, run privacy.sh
-- For extensive system tweaking beyond this script, use privacy.sh
-
----
-
-### 1.4 vscode.sh (VS Code Extension Installation)
-
-**Purpose:** Install 68+ VS Code extensions organized by category and functionality.
-
-**Location**: `/mac/vscode.sh`
-
-**Features:**
-- **68+ professionally selected extensions** organized by category
-- **Automatic VS Code CLI detection** - Finds code command in PATH
-- **Skip detection for existing extensions** - Doesn't reinstall already-installed extensions
-- **Installation statistics** - Shows total, installed, skipped, and failed counts
-- **Generates backup script** - Creates InstallVsCodeExtensions.sh for re-running
-
-**Extension Categories:**
-
-**AI & Productivity (5 extensions)**
-- GitHub Copilot - AI code completion
-- GitHub Copilot Chat - Conversational AI
-- Amazon Q - AWS AI assistant  
-- Continue - Codebase AI assistant
-- Claude (Anthropic) - Claude AI integration
-
-**Themes & Visual (6 extensions)**
-- Nord - Beautiful, arctic blue color scheme
-- Shades of Purple - Purple theme for aesthetic
-- Tokyo Night - Clean dark theme
-- Material Theme - Modern Material Design
-- vscode-icons - Beautiful file/folder icons
-- One Dark - One Dark color scheme
-
-**AWS & Cloud (5 extensions)**
-- AWS Toolkit - AWS service integration
-- Terraform - Infrastructure as code support
-- CloudFormation - AWS CloudFormation support
-- CloudFormation Linter - CloudFormation validation
-- AWS Lambda - Lambda function management
-
-**Code Quality & Linting (6 extensions)**
-- CodeSnap - Beautiful code screenshots
-- Turbo Console Log - Enhanced console.log
-- ESLint - JavaScript linting
-- Markdown Lint - Markdown validation
-- Prettier - Code formatter
-- Code Spell Checker - Spelling checker
-
-**Git & Version Control (3 extensions)**
-- GitLens - Git superpower for VS Code
-- Git History - Browse git history
-- Atlassian - Jira & Bitbucket integration
-
-**Python Development (7 extensions)**
-- Autopep8 - Python formatter
-- Debugpy - Python debugger
-- isort - Python import sorter
-- Pylance - Python language server
-- Python - Official Python extension
-- Python Envs - Python environment manager
-- Jupyter - Jupyter notebook support
-
-**JavaScript & React (7 extensions)**
-- Tailwind CSS - Utility-first CSS framework
-- JavaScript (ES6) snippets - Code snippets
-- React snippets - React component snippets
-- npm Intellisense - npm package autocomplete
-- ES7 React/Redux - Modern React snippets
-- Thunder Client - API testing tool
-- REST Client - REST API testing
-
-**Go Development (1 extension)**
-- Go - Official Go language support
-
-**GraphQL (3 extensions)**
-- GraphQL - GraphQL syntax highlighting
-- GraphQL Execution - GraphQL execution in editor
-- DGraph snippets - DGraph query snippets
-
-**Docker & DevOps (8 extensions)**
-- Docker - Docker container support
-- Kubernetes - Kubernetes cluster management
-- Remote - Remote SSH/WSL/Container support
-- Dev Containers - Development container support
-- GitHub Actions - GitHub Actions workflow editor
-- Tilt - Local Kubernetes development
-- Container Tools - Enhanced container features
-- Remote Repositories - Clone and work on remote repos
-
-**Jupyter & Data Science (3 extensions)**
-- Jupyter - Jupyter notebook support
-- Jupyter Keymap - Familiar Jupyter shortcuts
-- Jupyter Renderers - Enhanced Jupyter output rendering
-
-**Markdown & Documentation (3 extensions)**
-- Preview GitHub Style - GitHub markdown preview
-- Markdown All in One - Complete markdown toolkit
-- Markdown Lint - Markdown validation
-
-**Utilities & Tools (8 extensions)**
-- Edge DevTools - Microsoft Edge DevTools
-- PowerShell - PowerShell language support
-- Live Share - Real-time collaboration
-- YAML - YAML syntax highlighting
-- Pretty JSON - JSON formatting and validation
-- XML - XML language support
-- Excel Viewer - Excel file viewing
-- CSV - CSV file viewing
-
-**Gaming & Modding (5 extensions)**
-- Paradox Crusader Kings 2 - CK2 modding
-- Paradox Crusader Kings 3 - CK3 modding
-- Paradox Anno 1800 - Anno 1800 modding
-- Modding support - General game modding tools
-- Game development - Game engine integration
-
-**Requirements:**
-- VS Code installed
-- VS Code CLI available in PATH
-  - To install: Open VS Code → Cmd+Shift+P → "Shell Command: Install 'code' command in PATH"
-- Internet connection
-- ~5-10 minutes depending on internet speed
-
-**Execution Options:**
-
-Via interactive installer:
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
-# Select option 3
-```
-
-Direct installation:
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/vscode.sh)
-```
-
-Manual from cloned repo:
-```bash
-git clone https://github.com/peeweeh/pc-setup.git
-cd pc-setup/mac
-chmod +x vscode.sh
-./vscode.sh
-```
-
-**Output:**
-- Progress messages for each extension
-- Color-coded status:
-  - ✓ Installed
-  - ⏩ Skipped (already present)
-  - ✗ Failed
-- Summary statistics:
-  - Total extensions
-  - Successfully installed
-  - Already installed
-  - Failed installations
-- Backup script location (InstallVsCodeExtensions.sh)
-- Total installation time
-
----
-
-### 1.5 privacy.sh (Privacy & Security Hardening)
-
-**Purpose:** Comprehensive privacy and security hardening for macOS (831 lines).
-
-**Location**: `/mac/privacy.sh`
-
-**⚠️ WARNING:** This is an advanced script with extensive system changes. Review specific sections before running if you have concerns.
-
-**Author/Source**: Generated from [privacy.sexy](https://privacy.sexy) framework
-
-**Features:**
-
 #### Privacy & Telemetry (Comprehensive Siri Disabling)
 - **Removes Siri from menu bar** - Frees menu bar space
 - **Disables Siri data collection** - Stops audio/interaction logging
@@ -453,60 +257,54 @@ chmod +x vscode.sh
 - **Inactive memory purge** - Optimizes RAM usage
 
 #### Security Hardening
-- **Application Firewall** - Enables macOS firewall
+- **Application Firewall** - Enables macOS firewall, including stealth mode
 - **Guest user removal** - Deletes guest account
 - **Apple Remote Desktop disable** - Removes remote access
 - **Remote management disable** - Prevents remote control
 - **Automatic iCloud Document Storage** - Disables default sync
+- **Bonjour multicast advertising disabled** - Reduces network discoverability
 
 #### Privacy Features
-- **Location services restrictions** - Limits location access
+- **AirDrop disabled** - Blocks unsolicited file-sharing requests
+- **Advertising identifiers disabled** - Blocks personalized ad tracking
 - **Bluetooth privacy** - Restricts BLE advertising
 - **Camera/microphone access** - Limits app permissions
 - **Accessibility permissions** - Stricter privacy controls
 
 **Requirements:**
-- macOS 10.15 or later
-- Administrator privileges (script uses sudo)
+- macOS 10.15 or later (developed/tested most recently on macOS 27 "Golden Gate")
+- Administrator privileges (individual commands elevate with sudo as needed)
 - Some features may require SIP disabled (System Integrity Protection)
+- Logout/restart may be required for full effect
 - ~5-10 minutes runtime
-- System restart recommended after completion
 
 **Execution Options:**
 
-Via interactive installer (handles sudo automatically):
+Via interactive installer:
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
-# Select option 4
+# Select option 2
 ```
 
 Direct installation:
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/privacy.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_optimize.sh)
 ```
 
 Manual from cloned repo:
 ```bash
 git clone https://github.com/peeweeh/pc-setup.git
 cd pc-setup/mac
-chmod +x privacy.sh
-./privacy.sh
+chmod +x mac_optimize.sh
+./mac_optimize.sh
 ```
 
 **Output:**
-- Progress messages for each operation
-- Section headers (Siri, Telemetry, Security, etc)
-- Warnings if SIP needs to be disabled
-- Summary of changes applied
-- Restart recommendation
-
-**Notes:**
-- This script is separate from mac_install.sh to avoid redundancy
-- mac_install.sh handles essential performance tweaks
-- privacy.sh provides comprehensive privacy hardening
-- Run both for complete system optimization
-
----
+- Section headers (Performance, UI Speed, Dock, Finder, Privacy, Security, etc)
+- Color-coded completion messages
+- Warnings if SIP needs to be disabled for certain Siri-related items
+- Summary of all changes made
+- Recommendation to restart computer
 
 ## Section 2: Windows Scripts
 
@@ -560,9 +358,7 @@ pc-setup/
 │   ├── install.sh              # Interactive installer (main entry point)
 │   ├── spec.md                 # macOS-specific documentation
 │   ├── brew_install.sh         # Homebrew application installation
-│   ├── mac_install.sh          # Performance & UI optimization
-│   ├── vscode.sh               # VS Code extensions
-│   └── privacy.sh              # Advanced privacy hardening
+│   └── mac_optimize.sh         # Performance, UI & privacy hardening
 └── win/                        # Windows setup scripts
     ├── windows_install.ps1     # Main Windows setup
     └── vscode_extensions.ps1   # VS Code extensions
@@ -596,9 +392,10 @@ source ~/.zprofile
 
 #### Permission Denied Errors
 ```bash
-# Run with sudo (for mac_install.sh and privacy.sh)
-sudo bash ./mac_install.sh
-sudo bash ./privacy.sh
+# Individual commands in mac_optimize.sh elevate with sudo as needed and
+# will prompt for your password - run the script as your normal user,
+# not with `sudo` in front of the whole script.
+bash ./mac_optimize.sh
 ```
 
 #### VS Code Extension Installation Fails
@@ -878,9 +675,13 @@ All privacy and telemetry settings have been consolidated into `privacy_tweaks.p
 
 ---
 
-### 5.2 mac_install.sh
+### 5.2 mac_optimize.sh
 
-**Purpose:** System optimization for performance, battery life, and UI speed.
+**Purpose:** System optimization for performance, battery life, and UI speed, combined
+with privacy & security hardening (formerly two separate scripts, `mac_install.sh` and
+`privacy.sh`).
+
+**⚠️ WARNING:** Advanced script with extensive system changes (800+ lines). Review before running!
 
 **Features:**
 
@@ -888,8 +689,7 @@ All privacy and telemetry settings have been consolidated into `privacy_tweaks.p
 - Disables Photos AI analysis (facial recognition, huge battery saver)
 - Disables Media AI analysis (video indexing/scene detection)
 - Disables Game Center daemon
-- Fixes macOS 26 heuristic lag bug
-- Optimizes Electron app GPU usage (Chrome/Slack/VSCode)
+- Optimizes Electron app GPU usage (Chrome/Slack/etc)
 - Disables Spotlight disk indexing (saves I/O, breaks search)
 - Disables crash reporter dialogs
 - Clears inactive memory cache
@@ -935,89 +735,11 @@ All privacy and telemetry settings have been consolidated into `privacy_tweaks.p
 - Installs zsh-autosuggestions plugin
 - Nord Terminal theme installation
 
-**Requirements:**
-- macOS 10.15 or later
-- Administrator privileges for some operations (sudo)
-
-**Execution:**
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_install.sh)"
-```
-
-**Output:**
-- Section headers for each configuration area
-- Colored progress messages
-- Revert instructions for major changes
-- Restart recommendation
-
-**Notes:**
-- For comprehensive Siri/privacy settings, run privacy.sh separately
-- Some changes require restart to take full effect
-- Spotlight disabling breaks file search (revert: sudo mdutil -i on -a)
-
----
-
-### 5.3 vscode.sh
-
-**Purpose:** Install 68+ VS Code extensions organized by category.
-
-**Features:**
-- Automatic VS Code CLI availability check
-- Skip detection for already installed extensions
-- Installation statistics (installed/skipped/failed)
-- Generates backup installation script
-- Categories:
-  - **AI Assistants**: GitHub Copilot, Copilot Chat, Amazon Q, Claude Dev
-  - **Themes**: Nord, Shades of Purple, Tokyo Night, Material Theme
-  - **Icons**: vscode-icons
-  - **AWS/Cloud**: AWS Toolkit, Terraform, CloudFormation, CFN Lint
-  - **Code Quality**: CodeSnap, Turbo Console Log, ESLint, Markdown Lint
-  - **Git**: GitLens, Git History, Atlassian
-  - **Python**: Autopep8, Debugpy, isort, Pylance, Python Envs
-  - **JavaScript/React**: Tailwind CSS, React snippets, ES7 snippets
-  - **Go**: Go extension
-  - **GraphQL**: GraphQL syntax, execution, DGraph snippets
-  - **Containers/DevOps**: Docker, Kubernetes, Remote Containers, WSL, GitHub Actions, Tilt
-  - **Jupyter**: Jupyter, Jupyter Keymap, Jupyter Renderers
-  - **Markdown**: Preview GitHub Styles, Markdown All in One
-  - **Utilities**: Edge DevTools, PowerShell, Live Share, YAML, Pretty JSON, XML
-  - **Gaming/Modding**: Paradox tools (CK2, CK3, Anno)
-
-**Requirements:**
-- VS Code installed
-- VS Code CLI in PATH (Command: "Shell Command: Install 'code' command in PATH")
-- Internet connection
-
-**Execution:**
-```bash
-/Users/paul/dev/pc-setup/mac/vscode.sh
-```
-
-**Output:**
-- Colored status for each extension
-- Installation summary with counts
-- Generated backup script: InstallVsCodeExtensions.sh
-
----
-
-### 5.4 privacy.sh
-
-**Purpose:** Comprehensive privacy and security hardening (831 lines).
-
-**⚠️ WARNING:** Advanced script with extensive system changes. Review before running!
-
-**Features:**
-
 #### Privacy & Telemetry
 - Comprehensive Siri disabling (user, gui, system levels)
 - Disables Siri data collection and analytics
 - Removes Siri from menu bar and status menu
-- Disables telemetry for:
-  - Firefox
-  - Microsoft Office
-  - Homebrew
-  - .NET Core CLI
-  - PowerShell Core
+- Disables telemetry for: Firefox, Microsoft Office, Homebrew, .NET Core CLI, PowerShell Core
 
 #### System Cleaning
 - Clears CUPS printer job cache
@@ -1028,10 +750,11 @@ All privacy and telemetry settings have been consolidated into `privacy_tweaks.p
 - Purges inactive memory
 
 #### Security Hardening
-- Enables application firewall
+- Enables application firewall, including stealth mode
 - Removes guest user account
 - Disables Apple Remote Desktop
 - Disables automatic iCloud Drive document storage
+- Disables Bonjour multicast advertising
 - Configures stricter security settings
 
 #### Remote Access
@@ -1040,23 +763,25 @@ All privacy and telemetry settings have been consolidated into `privacy_tweaks.p
 - Clears remote desktop support files
 
 **Requirements:**
-- macOS 10.15 or later
-- Administrator privileges (runs with sudo elevation)
+- macOS 10.15 or later (developed/tested most recently on macOS 27 "Golden Gate")
+- Administrator privileges (individual commands elevate with sudo as needed)
 - Some features require SIP disabled (System Integrity Protection)
 
 **Execution:**
 ```bash
-sudo /Users/paul/dev/pc-setup/mac/privacy.sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_optimize.sh)"
 ```
 
 **Output:**
-- Progress messages for each operation
-- Warning if SIP needs to be disabled
+- Section headers for each configuration area (Performance, UI, Dock, Finder, Privacy, Security, etc)
+- Colored progress messages
+- Revert instructions for major changes
+- Restart recommendation
 
 **Notes:**
-- Generated from privacy.sexy framework
-- mac_install.sh includes essential performance optimizations
-- Use privacy.sh for comprehensive privacy hardening beyond performance
+- Generated privacy portions come from the privacy.sexy framework
+- Some changes require restart to take full effect
+- Spotlight disabling breaks file search (revert: sudo mdutil -i on -a)
 
 ---
 
@@ -1073,9 +798,7 @@ pc-setup/
 │   ├── README.md         # macOS scripts documentation
 │   ├── install.sh        # Interactive installer for macOS
 │   ├── brew_install.sh   # Homebrew application installation
-│   ├── mac_install.sh    # Performance & UI optimization
-│   ├── vscode.sh         # VS Code extensions
-│   └── privacy.sh        # Advanced privacy hardening
+│   └── mac_optimize.sh   # Performance, UI & privacy hardening
 └── win/                 # Windows setup scripts
     ├── windows_install.ps1
     ├── privacy_tweaks.ps1

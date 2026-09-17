@@ -13,10 +13,8 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 
 Then select from the menu:
 1. **Install Applications** (brew_install.sh)
-2. **Optimize System** (mac_install.sh)
-3. **Install VS Code Extensions** (vscode.sh)
-4. **Privacy Hardening** (privacy.sh)
-5. **Install ALL** (recommended for fresh Mac)
+2. **Optimize System & Harden Privacy** (mac_optimize.sh)
+3. **Install ALL** (recommended for fresh Mac)
 
 ---
 
@@ -27,7 +25,7 @@ Then select from the menu:
 
 **Features**:
 - Colored menu interface
-- 5 installation options
+- 3 installation options
 - Downloads scripts from GitHub
 - Handles sudo elevation automatically
 - Progress tracking
@@ -58,72 +56,30 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 
 ---
 
-### mac_install.sh - Optimize System
-**Purpose**: Performance and UI optimization for macOS.
+### mac_optimize.sh - Optimize System & Harden Privacy
+**Purpose**: Performance/UI optimization combined with privacy & security hardening for macOS.
 
 **What it does**:
 - **Performance**: Disables Photos AI, Media AI, Game Center, Siri
 - **UI Speed**: Instant animations, faster Dock, instant Finder
 - **System Config**: Dock auto-hide, Finder customization, keyboard/trackpad tuning
 - **Terminal**: Nord theme, Oh My Zsh plugins
-- **Security**: Firewall, fast keyboard repeat, auto-update
+- **Privacy**: Comprehensive Siri disabling, telemetry blocking (Firefox, Office, .NET,
+  PowerShell, Homebrew), AirDrop/Bonjour/advertising identifier disabling
+- **Security**: Firewall (incl. stealth mode), Guest user removal, remote access hardening
+- **Cleanup**: System/Xcode/DNS caches, quarantine and install logs, app caches (Docker,
+  npm, Yarn, Homebrew, etc.)
 
 **Run directly**:
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_optimize.sh)
 ```
 
-**Time**: 2-3 minutes
+**Time**: 5-10 minutes
+
+**⚠️ Warning**: Advanced script covering both optimization and privacy/security hardening. Review before running.
 
 **Note**: Restart recommended for full effect.
-
----
-
-### vscode.sh - Install VS Code Extensions
-**Purpose**: Install 68+ professionally-selected VS Code extensions.
-
-**What it includes**:
-- AI Assistants (Copilot, Amazon Q, Claude)
-- Themes (Nord, Dracula, Tokyo Night)
-- Languages (Python, JavaScript, Go, GraphQL, Rust)
-- DevOps (Docker, Kubernetes, Terraform, AWS)
-- Git tools (GitLens, Git History)
-- Jupyter notebooks, Markdown, REST Client
-- Gaming/modding tools
-
-**Run directly**:
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/vscode.sh)
-```
-
-**Requirements**:
-- VS Code installed
-- VS Code CLI in PATH (Cmd+Shift+P → "Shell Command: Install 'code' command in PATH")
-
-**Time**: 5-10 minutes
-
----
-
-### privacy.sh - Privacy & Security Hardening
-**Purpose**: Comprehensive privacy and security hardening (831 lines).
-
-**What it does**:
-- Disables all Siri services
-- Blocks telemetry (Firefox, Office, .NET, PowerShell)
-- Clears caches (system, CUPS, Xcode, DNS)
-- Hardens security (firewall, removes guest user, disables remote access)
-- Configures privacy settings (location, Bluetooth, camera/mic)
-
-**Run directly**:
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/privacy.sh)
-```
-
-**⚠️ Warning**: Advanced script. Review before running.
-
-**Time**: 5-10 minutes
-
-**Note**: System restart recommended.
 
 ---
 
@@ -134,20 +90,15 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/brew_install.sh)
 ```
 
-### Just Optimize System Performance
+### Just Optimize System & Harden Privacy
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_install.sh)
-```
-
-### Just Install VS Code Extensions
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/vscode.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_optimize.sh)
 ```
 
 ### Install Everything (Fresh Mac Setup)
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
-# Select option 5
+# Select option 3
 ```
 
 ### Run Script from Cloned Repository
@@ -200,22 +151,6 @@ chmod +x *.sh
 
 ---
 
-## VS Code Extensions Installed
-
-**By Category:**
-
-**AI**: Copilot, Copilot Chat, Amazon Q, Continue, Claude
-**Themes**: Nord, Tokyo Night, Dracula, One Dark, Shades of Purple, vscode-icons
-**AWS**: AWS Toolkit, Terraform, CloudFormation, CFN Lint
-**Code Quality**: ESLint, Prettier, Pylance, CodeSnap, Turbo Console Log
-**Git**: GitLens, Git History, Atlassian
-**Languages**: Python, JavaScript, Go, GraphQL, Rust, C++, SQL, Markdown
-**DevOps**: Docker, Kubernetes, Remote SSH, Dev Containers, GitHub Actions, Tilt
-**Data**: Jupyter, REST Client, Thunder Client
-**Gaming**: CK2/CK3/Anno 1800 modding tools
-
----
-
 ## Troubleshooting
 
 ### Script Won't Run
@@ -238,20 +173,26 @@ echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
 source ~/.zprofile
 ```
 
-### VS Code Extensions Won't Install
+### Icons Show as Boxes/`[?]` (Powerlevel10k, `eza --icons`)
+The Nerd Fonts installed by `brew_install.sh` (Fira Code Nerd Font, Hack Nerd Font) are
+correctly placed in `~/Library/Fonts`, but macOS Terminal.app doesn't automatically switch
+to them. `mac_optimize.sh`'s Terminal theme step now applies a Nerd Font to the Nord/Basic
+Terminal profiles automatically (run `brew_install.sh` **before** `mac_optimize.sh`, which
+is the default order in `install.sh`'s "Install ALL" flow). If icons still look wrong:
 ```bash
-# Check VS Code CLI
-code --version
+# Verify the fonts are actually installed
+ls ~/Library/Fonts | grep -i nerd
 
-# If not found, open VS Code and run:
-# Cmd+Shift+P → "Shell Command: Install 'code' command in PATH"
+# Manually set the font: Terminal > Settings > Profiles > Text > Font
+# Choose "Hack Nerd Font Mono" (default) or "FiraCode Nerd Font Mono"
 ```
 
 ### Permission Denied
 ```bash
-# Run with sudo for system optimization scripts
-sudo bash ./mac_install.sh
-sudo bash ./privacy.sh
+# Individual commands in mac_optimize.sh elevate with sudo as needed and
+# will prompt for your password - run the script as your normal user,
+# not with `sudo` in front of the whole script.
+bash ./mac_optimize.sh
 ```
 
 ### Revert Changes
@@ -274,9 +215,7 @@ sudo mdutil -i on -a
 | Script | Installs | Configures | Disables | Time |
 |--------|----------|-----------|----------|------|
 | **brew_install.sh** | 40+ apps, 20+ CLIs, fonts | Oh My Zsh, shell aliases | Docker/Ollama/VPN auto-start | 5-10m |
-| **mac_install.sh** | — | Dock, Finder, keyboard, terminal | Siri, Photos AI, animations | 2-3m |
-| **vscode.sh** | 68+ extensions | Extension categories | — | 5-10m |
-| **privacy.sh** | — | Firewall, security | Siri, telemetry, location | 5-10m |
+| **mac_optimize.sh** | — | Dock, Finder, keyboard, terminal, firewall | Siri, telemetry, Photos AI, animations | 5-10m |
 
 ---
 
@@ -286,9 +225,7 @@ For a fresh Mac:
 1. Run `install.sh` and select "Install ALL"
 2. Or manually in this order:
    - brew_install.sh (applications)
-   - mac_install.sh (optimization)
-   - vscode.sh (extensions)
-   - privacy.sh (privacy hardening)
+   - mac_optimize.sh (optimization + privacy hardening)
 
 ---
 

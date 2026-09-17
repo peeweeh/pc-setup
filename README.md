@@ -14,12 +14,17 @@ powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercon
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
 ```
 
-Both open interactive menus with 5 options:
+**Windows** installer opens a menu with 5 options:
 1. **📦 Install Applications** (40-74+ apps)
-2. **⚙️ Optimize System** / **🔧 Development Setup**
-3. **🎨 Install VS Code Extensions** (50-68+ extensions)
-4. **🔒 Privacy Hardening**
+2. **🔧 Development Setup**
+3. **🎨 Install VS Code Extensions** (50+ extensions)
+4. **🔒 Privacy Tweaks**
 5. **🚀 Install ALL** (recommended for fresh system)
+
+**macOS** installer opens a menu with 3 options:
+1. **📦 Install Applications** (40-74+ apps)
+2. **⚙️ Optimize System & Harden Privacy** (combined performance + privacy hardening)
+3. **🚀 Install ALL** (recommended for fresh system)
 
 ---
 
@@ -53,11 +58,11 @@ Both open interactive menus with 5 options:
 - **System Restore Point** - Created before applying tweaks for safety
 
 ### macOS
-- **Interactive Installer** - Menu-driven setup with 5 options (Apps, Optimize, VS Code, Privacy, All)
+- **Interactive Installer** - Menu-driven setup with 3 options (Apps, Optimize + Privacy, All)
 - **Homebrew Package Installation** - 3 tiers: Essential / Productivity / Everything + 20+ CLI tools
 - **System Optimization** - Performance, battery, and UI speed improvements
 - **Disables Siri, Photos AI, Media AI** - Significant battery savings
-- **Privacy Hardening** - Comprehensive 831-line privacy configuration
+- **Privacy & Security Hardening** - Combined with system optimization in a single script
 - **Shell Enhancement** - Powerlevel10k for Zsh, plugins, aliases
 - **Dock & Finder Customization** - Auto-hide, speed improvements, clean layout
 - **Terminal Theme** - Nord color scheme for beautiful terminal
@@ -150,10 +155,8 @@ Shows menu:
 ╚═══════════════════════════════════════════════════╝
 
 1) 📦 Install Applications (brew_install.sh)
-2) ⚙️  Optimize System (mac_install.sh)
-3) 🎨 Install VS Code Extensions (vscode.sh)
-4) 🔒 Privacy Hardening (privacy.sh)
-5) 🚀 Install ALL (recommended for fresh Mac)
+2) ⚙️  Optimize System & Harden Privacy (mac_optimize.sh)
+3) 🚀 Install ALL (recommended for fresh Mac)
 
 q) ❌ Quit
 ```
@@ -164,22 +167,10 @@ q) ❌ Quit
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/brew_install.sh)
 ```
 
-#### Just Optimize System
+#### Just Optimize System & Harden Privacy
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_install.sh)
-```
-
-#### Just VS Code Extensions
-
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/vscode.sh)
-```
-
-#### Just Privacy Hardening
-
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/privacy.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/mac_optimize.sh)
 ```
 
 #### Run Locally from Cloned Repository
@@ -472,15 +463,15 @@ Comprehensive Homebrew installation script with:
 
 **Runtime**: ~5 min (Essential) / ~15-20 min (Productivity) / ~30-60 min (Everything)
 
-#### `mac_install.sh` (System Optimization)
-Comprehensive macOS customization and performance optimization:
+#### `mac_optimize.sh` (System Optimization & Privacy Hardening)
+Combined macOS performance/UI optimization and privacy & security hardening
+(formerly two separate scripts, `mac_install.sh` and `privacy.sh`):
 
 **Performance Enhancements:**
 - Disables Siri and Siri suggestions (reclaims system resources)
 - Disables Photos AI processing (stops memory/storage drain)
 - Disables Media AI features (eliminates background processing)
 - Disables Game Center and related services
-- Fixes macOS Sonoma lag issues
 - Optimizes launchd services
 
 **UI Speed Improvements:**
@@ -513,34 +504,18 @@ Comprehensive macOS customization and performance optimization:
 - Powerlevel10k prompt configuration
 - Syntax highlighting and auto-suggestions enabled
 
-**Runtime**: 2-3 minutes
-
-#### `vscode.sh` (68+ Extensions)
-Automated VS Code extension installation with categorized setup:
-
-**Categories**: AI, Themes, Languages, DevOps, Git, Data Science, Utilities, Gaming
-
-**Features:**
-- Colored progress output with statistics
-- Automatically skips already-installed extensions
-- Generates backup installation script
-- Shows total count and installation time
-- Requires VS Code CLI in PATH (automatically detected)
-
-**Runtime**: 5-10 minutes
-
-#### `privacy.sh` (Advanced Privacy Hardening)
-Comprehensive privacy and security hardening (831 lines):
-- **Framework**: Generated from [privacy.sexy](https://privacy.sexy) framework
+**Privacy & Security Hardening:**
+- **Framework**: Privacy portions generated from [privacy.sexy](https://privacy.sexy) framework
 - **Comprehensive Siri disabling**: All Siri services, suggestions, and data collection
 - **Telemetry blocking**: Firefox, Microsoft Office, Homebrew, .NET Core, PowerShell
 - **System cleaning**: Cache clearing, DNS purging, Xcode cache, trash, logs
-- **Privacy features**: Location services, Bluetooth, accessibility permissions
-- **Security hardening**: Firewall configuration, remote access disabling, guest user removal
-- **iCloud settings**: Document storage, photo sync, keychain settings
-- **Advanced features**: System integrity protection checks, firmware updates, secure boot
+- **Privacy features**: AirDrop, Bonjour, advertising identifiers, iCloud document storage
+- **Security hardening**: Firewall (incl. stealth mode), remote access disabling, guest user removal
 
-⚠️ **Note**: This is an advanced script with 831 lines of hardening rules. Review specific sections before running if you have concerns about compatibility with your workflow.
+⚠️ **Note**: This is an advanced script combining optimization with 800+ lines of
+privacy/security hardening rules. Review specific sections before running if you have
+concerns about compatibility with your workflow. Individual commands elevate with `sudo`
+as needed - run the script as your normal user, not with `sudo` in front of it.
 
 **Runtime**: 5-10 minutes
 
@@ -572,9 +547,9 @@ notepad $PROFILE
 
 **Modify Brew Packages**: Edit `brew_install.sh` and add/remove `brew install` commands
 
-**Customize System Settings**: Edit `mac_install.sh` to adjust Dock size, Finder settings, etc.
+**Customize System Settings**: Edit `mac_optimize.sh` to adjust Dock size, Finder settings, etc.
 
-**Change Terminal Theme**: Replace the Nord theme URL in `mac_install.sh`
+**Change Terminal Theme**: Replace the Nord theme URL in `mac_optimize.sh`
 
 ## 🔒 Privacy & Security
 
@@ -589,11 +564,12 @@ Comprehensive privacy hardening with 471 lines of registry tweaks:
 - **General privacy** - Removes default user accounts, minimizes DISM data
 - **Creates restore point** - Allows reverting changes if needed
 
-### macOS Privacy (privacy.sh)
-Advanced privacy hardening with 831 lines from privacy.sexy framework:
+### macOS Privacy (mac_optimize.sh)
+Advanced privacy hardening (privacy portions from privacy.sexy framework), combined with
+system optimization in a single script:
 - **Disables Siri completely** - Removes all Siri services and data collection
 - **Blocks telemetry** - Firefox, Office, Homebrew, .NET, PowerShell
-- **Security hardening** - Firewall, removes guest user, disables remote access
+- **Security hardening** - Firewall (incl. stealth mode), removes guest user, disables remote access
 - **Clears data** - System caches, CUPS, Xcode, DNS, trash
 
 ## ⚠️ Important Notes
@@ -612,7 +588,7 @@ Advanced privacy hardening with 831 lines from privacy.sexy framework:
 - **Xcode Command Line Tools** installed automatically by Homebrew
 - **System restart recommended** - For full effect of system tweaks
 - **Some settings require logout** - Especially shell configuration changes
-- **privacy.sh is advanced** - Review before running on critical systems
+- **mac_optimize.sh is advanced** - Review before running on critical systems
 
 ## 🤝 Contributing
 

@@ -185,8 +185,7 @@ pc-setup/
 │   └── vscode_extensions.ps1  # VS Code setup
 ├── mac/
 │   ├── brew_install.sh         # Homebrew packages
-│   ├── mac_install.sh          # System customization
-│   └── vscode.sh               # VS Code setup
+│   └── mac_optimize.sh         # System customization & privacy hardening
 ├── README.md
 ├── LICENSE
 ├── CONTRIBUTING.md

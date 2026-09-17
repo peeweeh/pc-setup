@@ -220,6 +220,16 @@ for font in "${fonts[@]}"; do
 done
 
 
+# Install Oh My Zsh BEFORE we customize .zshrc below. Its installer replaces ~/.zshrc
+# with its own default template (backing up any existing file), so it must run first -
+# otherwise it would wipe out the Powerlevel10k/alias customizations added further down.
+if [[ ! -d ~/.oh-my-zsh ]]; then
+    print_info "Installing Oh My Zsh..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+else
+    print_warning "Oh My Zsh already installed, skipping..."
+fi
+
 # Configure shell (zsh) if not already configured
 print_info "Configuring zsh shell..."
 
