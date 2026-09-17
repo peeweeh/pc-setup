@@ -74,43 +74,37 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 
 **Features:**
 - **Automatic Homebrew installation** if not present (includes Apple Silicon PATH setup)
-- **Priority app installation** - 1Password and Arc installed first for immediate access
-- **Smart ordering** - Faster/smaller apps first, heavy apps (Docker, Figma) last
-- **40+ applications** organized by category:
-  - **Essentials**: 1Password (password manager), Arc (browser), VS Code (IDE)
-  - **Browsers**: Google Chrome, Brave, Arc Browser
-  - **Development**: Git, GitHub Desktop, Postman, Warp terminal, Docker, AWS CLI, AWS Nuke
-  - **Communication**: Slack, Microsoft Teams, Discord, Signal, WhatsApp, Zoom, Telegram
-  - **Utilities**: Rectangle (window management), Raycast (productivity), BetterMouse, Finder enhancements
-  - **Productivity**: ChatGPT, Claude, Evernote, Obsidian, Microsoft Office
-  - **Media**: VLC, Ferdium
-  - **Enterprise**: Amazon Chime, Amazon Workspaces, Google Drive, Microsoft Remote Desktop
-  - **Cloud/VPN**: NordVPN, ProtonVPN, OneDrive
-  - **Development Tools**: Fig, DevToys
-  - **Heavy Apps**: Docker Desktop, Figma (installed last)
+- **Two install tiers**, prompted interactively (Slow includes everything in Fast plus more):
+  - **Fast** (~31 apps): 1Password, Arc, Comet, BetterMouse, Clipy, Moom, Rectangle,
+    Raycast, The Unarchiver, GitHub Desktop, Postman, Sourcetree, VS Code, Warp, Fig,
+    DevToys, Copilot CLI, Brave, Google Chrome, Signal, Telegram, WhatsApp, Discord,
+    Slack, Beeper, ChatGPT, Claude, Obsidian, VLC, Zoom
+  - **Slow** (adds ~14 more apps): ProtonVPN, Proton Mail, Proton Drive, Google Drive,
+    OneDrive, Microsoft Office, Teams, Remote Desktop, Amazon Workspaces, Docker
+    Desktop, Figma, Home Assistant, iStat Menus, Steam
 
-- **CLI Tools** (20+ formulae): 
-  - Core: git, awscli, aws-nuke
-  - Text processing: bat (cat with syntax), ripgrep, fd
-  - Navigation: fzf (fuzzy finder), zoxide (smart cd)
-  - System monitoring: btop (better top)
-  - Shells: go, node, ollama, python
-  - File utilities: eza (ls replacement), exa
+- **CLI Tools** (20+ formulae, both tiers): git, gh, awscli, aws-nuke, bat, btop,
+  diff-so-fancy, docker, eza, fzf, go, node, ollama, pandoc, pipx, powerlevel10k,
+  serverless, telnet, tree, uv, plus Python linters/formatters (ruff, black, isort,
+  flake8, vulture)
 
-- **Fonts**: Fira Code, Fira Code Nerd Font, Hack Nerd Font
+- **Fonts**: Fira Code, Fira Code Nerd Font, Hack Nerd Font (with quarantine-flag
+  stripping so they actually register with macOS)
 
 - **Shell Configuration**:
-  - Oh My Zsh installation and configuration
+  - Oh My Zsh installation and configuration (run before `.zshrc` customization so it
+    doesn't clobber Powerlevel10k/aliases)
   - Powerlevel10k theme (beautiful, fast prompt)
   - zsh-syntax-highlighting plugin
   - zsh-autosuggestions plugin
   - Custom aliases (eza for ls, bat for cat, fzf_cd for smart navigation)
 
-- **Service Management**:
-  - Disables auto-start for Docker Desktop
-  - Disables auto-start for Ollama
-  - Disables auto-start for VPN services (NordVPN, ProtonVPN)
-  - Keeps user-facing apps available while removing background resource drain
+- **Background Activity Disabled** - after installing, removes all login items and
+  disables any newly-added LaunchAgents so nothing auto-starts; open apps manually
+  when you need them.
+
+- **Animated Progress** - a spinner hides Homebrew's noisy default output; only shown
+  if an install actually fails, so you can see what went wrong.
 
 - **Idempotent Design** - Safe to run multiple times
   - Checks if packages already installed before installing
@@ -118,6 +112,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
   - Updates Homebrew quietly if needed
 
 - **Error Handling** - Exits cleanly on failures
+  - Refuses to run as root/sudo (prevents root-owned dotfiles like `~/.oh-my-zsh`)
   - Uses `set -e` and `set -u` for strict error handling
   - Colored output (RED for errors, GREEN for success)
   - Shows installation progress
@@ -126,7 +121,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 - macOS 10.15 or later
 - Internet connection
 - Xcode Command Line Tools (auto-prompted during Homebrew install)
-- ~5-10 minutes depending on internet speed
+- ~15-70 minutes depending on tier and internet speed
 
 **Execution Options:**
 
@@ -154,7 +149,7 @@ chmod +x brew_install.sh
   - ✓ (GREEN) - Installation successful
   - ✗ (RED) - Installation failed
   - ⚠ (YELLOW) - Already installed, skipping
-- Shows progress for each package
+- Animated spinner during each install; only reveals output on failure
 - Final summary with completion time
 - Next step suggestion (run mac_optimize.sh for optimization & privacy hardening)
 

@@ -44,6 +44,53 @@ print_option() {
     echo -e "${BLUE}$1${NC} $2"
 }
 
+# ── Spinner / animated progress ─────────────────────────────────────────────────
+SPINNER_FRAMES=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+
+run_spinner() {
+  local msg="$1"; shift
+  local logfile
+  logfile=$(mktemp)
+  "$@" > "$logfile" 2>&1 &
+  local pid=$!
+  local i=0
+  tput civis 2>/dev/null || true
+  while kill -0 "$pid" 2>/dev/null; do
+    local frame="${SPINNER_FRAMES[$((i % ${#SPINNER_FRAMES[@]}))]}"
+    printf "\r${CYAN}%s${NC} %s" "$frame" "$msg"
+    i=$((i + 1))
+    sleep 0.08
+  done
+  tput cnorm 2>/dev/null || true
+  local status=0
+  wait "$pid" || status=$?
+  if [[ $status -eq 0 ]]; then
+    printf "\r${GREEN}✓${NC} %s\n" "$msg"
+  else
+    printf "\r${RED}✗${NC} %s (failed)\n" "$msg"
+    echo -e "${YELLOW}--- output ---${NC}"
+    cat "$logfile"
+    echo -e "${YELLOW}--------------${NC}"
+  fi
+  rm -f "$logfile"
+  return $status
+}
+
+# Fetches a remote script's contents into $FETCHED_SCRIPT (with an animated
+# spinner while the download is in progress), then it can be executed locally
+# via `bash -c "$FETCHED_SCRIPT"` without hitting the network again.
+FETCHED_SCRIPT=""
+fetch_script() {
+  local script_url="$1"
+  local tmpfile
+  tmpfile=$(mktemp)
+  local status=0
+  run_spinner "Fetching $(basename "$script_url")..." curl -fsSL "$script_url" -o "$tmpfile" || status=$?
+  FETCHED_SCRIPT=$(cat "$tmpfile")
+  rm -f "$tmpfile"
+  return $status
+}
+
 # Welcome banner
 clear
 print_header "macOS Setup - Interactive Installer"
@@ -52,10 +99,11 @@ echo -e "${CYAN}Author: mrfixit027 | https://github.com/peeweeh/pc-setup${NC}\n"
 echo -e "${BOLD}Available Setup Scripts:${NC}"
 echo ""
 echo -e "${GREEN}1.${NC} ${BOLD}brew_install.sh${NC}     - Install applications via Homebrew"
-echo -e "   ${CYAN}→${NC} 3 tiers: Essential / Productivity / Everything"
+echo -e "   ${CYAN}→${NC} 2 tiers: Fast / Slow (Fast + Office, Docker, cloud, heavy apps)"
 echo -e "   ${CYAN}→${NC} Configures shell with Powerlevel10k"
 echo -e "   ${CYAN}→${NC} Sudo handled once upfront (no repeated prompts)"
-echo -e "   ${YELLOW}⏱${NC}  ~5-60 minutes (depends on tier)"
+echo -e "   ${CYAN}→${NC} Disables login items/background agents for installed apps"
+echo -e "   ${YELLOW}⏱${NC}  ~15-70 minutes (depends on tier)"
 echo ""
 echo -e "${GREEN}2.${NC} ${BOLD}mac_optimize.sh${NC}     - Performance, UI & privacy hardening ${YELLOW}(combined)${NC}"
 echo -e "   ${CYAN}→${NC} Disables AI analysis (Photos, Media) - huge battery saver"
@@ -79,8 +127,8 @@ while true; do
     case $choice in
         1)
             print_header "Installing Applications (brew_install.sh)"
-            print_info "Downloading and executing brew_install.sh..."
-            /bin/bash -c "$(curl -fsSL ${GITHUB_RAW}/brew_install.sh)"
+            fetch_script "${GITHUB_RAW}/brew_install.sh" || { print_error "Failed to fetch brew_install.sh"; exit 1; }
+            /bin/bash -c "$FETCHED_SCRIPT"
             break
             ;;
         2)
@@ -90,8 +138,8 @@ while true; do
             echo -ne "${YELLOW}Are you sure you want to continue? [y/N]: ${NC}"
             read -r confirm
             if [[ $confirm =~ ^[Yy]$ ]]; then
-                print_info "Downloading and executing mac_optimize.sh..."
-                /bin/bash -c "$(curl -fsSL ${GITHUB_RAW}/mac_optimize.sh)"
+                fetch_script "${GITHUB_RAW}/mac_optimize.sh" || { print_error "Failed to fetch mac_optimize.sh"; exit 1; }
+                /bin/bash -c "$FETCHED_SCRIPT"
             else
                 print_info "Skipped mac_optimize.sh"
             fi
@@ -108,8 +156,8 @@ while true; do
             
             # Step 1: brew_install.sh
             print_header "Step 1/2: Installing Applications"
-            print_info "Running brew_install.sh..."
-            /bin/bash -c "$(curl -fsSL ${GITHUB_RAW}/brew_install.sh)" || {
+            fetch_script "${GITHUB_RAW}/brew_install.sh" || { print_error "Failed to fetch brew_install.sh"; exit 1; }
+            /bin/bash -c "$FETCHED_SCRIPT" || {
                 print_error "brew_install.sh failed. Stopping."
                 exit 1
             }
@@ -121,8 +169,8 @@ while true; do
             echo -ne "${YELLOW}Run mac_optimize.sh? [y/N]: ${NC}"
             read -r optimize_confirm
             if [[ $optimize_confirm =~ ^[Yy]$ ]]; then
-                print_info "Running mac_optimize.sh..."
-                /bin/bash -c "$(curl -fsSL ${GITHUB_RAW}/mac_optimize.sh)" || {
+                fetch_script "${GITHUB_RAW}/mac_optimize.sh" || { print_error "Failed to fetch mac_optimize.sh"; }
+                /bin/bash -c "$FETCHED_SCRIPT" || {
                     print_error "mac_optimize.sh failed. Continuing..."
                 }
             else

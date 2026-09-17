@@ -59,7 +59,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 
 ### macOS
 - **Interactive Installer** - Menu-driven setup with 3 options (Apps, Optimize + Privacy, All)
-- **Homebrew Package Installation** - 3 tiers: Essential / Productivity / Everything + 20+ CLI tools
+- **Homebrew Package Installation** - 2 tiers: Fast / Slow + 20+ CLI tools
 - **System Optimization** - Performance, battery, and UI speed improvements
 - **Disables Siri, Photos AI, Media AI** - Significant battery savings
 - **Privacy & Security Hardening** - Combined with system optimization in a single script
@@ -446,22 +446,21 @@ Main entry point for setting up macOS:
 - Automatically elevates to sudo when needed
 - Downloads scripts from GitHub on-the-fly (no manual cloning required)
 
-#### `brew_install.sh` (50+ Applications)
+#### `brew_install.sh` (65+ Applications)
 Comprehensive Homebrew installation script with:
 - **Automatic Homebrew installation** if not present (handles Apple Silicon & Intel)
-- **Three install tiers** (cumulative):
-  - **Essential** (~25 apps) – Dev tools & core utilities (1password, arc, vscode, raycast, postman, etc.)
-  - **Productivity** (~40 apps) – + browsers, comms, productivity (chrome, slack, obsidian, zoom, etc.)
-  - **Everything** (50+ apps) – + office, cloud/VPN, enterprise, heavy apps (docker, figma, steam, etc.)
+- **Two install tiers**:
+  - **Fast** (~31 apps) – Dev tools, browsers, comms & productivity (1password, arc, vscode, raycast, chrome, slack, etc.)
+  - **Slow** (~14 more apps) – Fast + Office, Docker, cloud/VPN, and other large/slow installs (figma, steam, docker-desktop, etc.)
 - **Sudo keep-alive** – Password asked once; background loop refreshes it automatically
 - **Idempotent design** - Safe to run multiple times without duplication
 - **Error handling** - Exits cleanly on any installation failure
-- **Colored output** with status indicators
-- **CLI tools** (20+ formulae): bat, fzf, eza, btop, git, awscli, docker, etc.
+- **Animated progress** - Spinner hides noisy Homebrew output; only shown on failure
+- **CLI tools** (20+ formulae): bat, fzf, eza, btop, git, gh, ruff, black, awscli, docker, etc.
 - **Oh My Zsh configuration** with Powerlevel10k, syntax highlighting, auto-suggestions
-- **Service management**: Disables auto-start for Docker, Ollama, VPNs
+- **Background activity disabled** for all installed apps (login items + LaunchAgents)
 
-**Runtime**: ~5 min (Essential) / ~15-20 min (Productivity) / ~30-60 min (Everything)
+**Runtime**: ~15-20 min (Fast) / ~40-70 min (Slow)
 
 #### `mac_optimize.sh` (System Optimization & Privacy Hardening)
 Combined macOS performance/UI optimization and privacy & security hardening

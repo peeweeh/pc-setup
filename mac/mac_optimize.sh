@@ -50,6 +50,41 @@ print_header() {
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
 }
 
+# ── Spinner / animated progress ─────────────────────────────────────────────────
+# Runs a command in the background with a fun animated spinner in front of it,
+# hiding its (often noisy) stdout/stderr unless it actually fails - in which case
+# the captured output is dumped so you can debug it.
+SPINNER_FRAMES=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+
+run_spinner() {
+  local msg="$1"; shift
+  local logfile
+  logfile=$(mktemp)
+  "$@" > "$logfile" 2>&1 &
+  local pid=$!
+  local i=0
+  tput civis 2>/dev/null || true
+  while kill -0 "$pid" 2>/dev/null; do
+    local frame="${SPINNER_FRAMES[$((i % ${#SPINNER_FRAMES[@]}))]}"
+    printf "\r${CYAN}%s${NC} %s" "$frame" "$msg"
+    i=$((i + 1))
+    sleep 0.08
+  done
+  tput cnorm 2>/dev/null || true
+  local status=0
+  wait "$pid" || status=$?
+  if [[ $status -eq 0 ]]; then
+    printf "\r${GREEN}✓${NC} %s\n" "$msg"
+  else
+    printf "\r${RED}✗${NC} %s (failed)\n" "$msg"
+    echo -e "${YELLOW}--- output ---${NC}"
+    cat "$logfile"
+    echo -e "${YELLOW}--------------${NC}"
+  fi
+  rm -f "$logfile"
+  return $status
+}
+
 print_header "macOS System Optimization & Privacy Hardening"
 echo -e "${CYAN}Author: mrfixit027 | https://github.com/peeweeh/pc-setup${NC}\n"
 print_warning "This script makes extensive system changes (performance tweaks, cache/log"
@@ -273,7 +308,7 @@ CURRENT_DEFAULT_PROFILE=$(defaults read com.apple.Terminal "Default Window Setti
 CURRENT_STARTUP_PROFILE=$(defaults read com.apple.Terminal "Startup Window Settings" 2>/dev/null || echo "$CURRENT_DEFAULT_PROFILE")
 
 print_info "Downloading Nord Terminal theme (added as an optional profile, not forced as default)..."
-if curl -fsSL "$url" -o "$file"; then
+if run_spinner "Downloading Nord Terminal theme..." curl -fsSL "$url" -o "$file"; then
   open "$file"
   # Give Terminal a moment to import the new profile before we touch it via AppleScript
   sleep 2
@@ -361,7 +396,7 @@ sudo dscacheutil -flushcache
 sudo killall -HUP mDNSResponder
 
 print_header "Clear inactive memory"
-sudo purge
+run_spinner "Purging inactive memory..." sudo purge
 
 print_header "Remove Guest User"
 if ! command -v 'sysadminctl' &> /dev/null; then
@@ -552,9 +587,9 @@ fi
 
 print_header "Clear Homebrew cache"
 if type "brew" &>/dev/null; then
-    brew cleanup -s &>/dev/null
+    run_spinner "Cleaning Homebrew cache..." brew cleanup -s
     rm -rfv $(brew --cache) &>/dev/null
-    brew tap --repair &>/dev/null
+    run_spinner "Repairing Homebrew taps..." brew tap --repair
 fi
 
 print_header "Clear old Ruby gem versions"

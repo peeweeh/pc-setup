@@ -98,7 +98,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 ### Install Everything (Fresh Mac Setup)
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
-# Select option 3
+# Select option 3, then choose tier 2 (Slow) when prompted by brew_install.sh
 ```
 
 ### Run Script from Cloned Repository
@@ -113,41 +113,33 @@ chmod +x *.sh
 
 ## Applications Installed
 
-**Essentials** (installed first):
-- 1Password, Arc, VS Code
+`brew_install.sh` prompts for a tier (Fast or Slow); Slow installs everything in
+Fast plus the heavier/slower items.
 
-**Browsers**:
-- Google Chrome, Brave
+**Fast tier**:
+- Core utilities: 1Password, Arc, Comet, BetterMouse, Clipy, Moom, Rectangle, Raycast, The Unarchiver
+- Dev tools: GitHub Desktop, Postman, Sourcetree, VS Code, Warp, Fig, DevToys, Copilot CLI
+- Browsers: Brave, Google Chrome
+- Communication: Signal, Telegram, WhatsApp, Discord, Slack, Beeper
+- Productivity: ChatGPT, Claude, Obsidian, VLC, Zoom
 
-**Communication**:
-- Slack, Teams, Discord, Signal, WhatsApp, Zoom, Telegram
+**Slow tier** (adds on top of Fast):
+- Cloud & VPN: ProtonVPN, Proton Mail, Proton Drive, Google Drive, OneDrive
+- Microsoft Office, Teams, Remote Desktop
+- Amazon Workspaces
+- Docker Desktop, Figma, Home Assistant, iStat Menus, Steam
 
-**Development**:
-- Git, GitHub Desktop, Postman, Warp, Docker, AWS CLI, AWS Nuke, Fig, DevToys, Node.js, Go, Python, Ollama
-
-**Utilities**:
-- Rectangle, Raycast, BetterMouse, Clipy, Moom, Alfred
-
-**CLI Tools**:
-- bat, fzf, btop, eza, exa, ripgrep, fd, jq, zoxide
-
-**Productivity**:
-- ChatGPT, Claude, Evernote, Obsidian, Microsoft Office
-
-**Enterprise**:
-- Microsoft Teams, Amazon Chime, Amazon Workspaces, Microsoft Remote Desktop, Google Drive, OneDrive
-
-**Cloud/VPN**:
-- NordVPN, ProtonVPN
-
-**Media**:
-- VLC, Ferdium
-
-**Heavy Apps** (installed last):
-- Docker Desktop, Figma, Steam
+**CLI Tools** (both tiers):
+- git, gh, awscli, aws-nuke, bat, btop, diff-so-fancy, docker, eza, fzf, go, node,
+  ollama, pandoc, pipx, powerlevel10k, serverless, telnet, tree, uv
+- Python linters/formatters: ruff, black, isort, flake8, vulture
 
 **Fonts**:
 - Fira Code, Fira Code Nerd Font, Hack Nerd Font
+
+**Background activity**: after installing, `brew_install.sh` removes all login
+items and disables any newly-added background LaunchAgents, so nothing runs
+in the background automatically - open apps manually when you need them.
 
 ---
 

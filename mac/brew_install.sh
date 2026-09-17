@@ -1,9 +1,6 @@
 #!/bin/bash
 #
-print_header "Homebrew Application Installation Script"
-echo -e "${CYAN}Author: mrfixit027 | https://github.com/peeweeh/pc-setup${NC}\n"
-
-# Check if Homebrew is installed, install if not
+# Homebrew Application Installation Script
 # Author: mrfixit027
 # Repository: https://github.com/peeweeh/pc-setup
 #
@@ -11,22 +8,12 @@ echo -e "${CYAN}Author: mrfixit027 | https://github.com/peeweeh/pc-setup${NC}\n"
 set -e  # Exit on error
 set -u  # Exit on undefined variable
 
-# ── Sudo keep-alive ─────────────────────────────────────────────────────────────
-# Some cask installs need sudo (e.g. microsoft-office, docker-desktop).
-# Ask once upfront and keep the session alive in the background.
-echo ""
-echo -e "\033[1;33m[NOTE]\033[0m Some Homebrew casks require sudo. Enter your password once now"
-echo -e "       and it will be kept alive for the rest of the install.\n"
-sudo -v
-# Background loop: refresh sudo timestamp every 50s until this script exits
-while true; do sudo -n true; sleep 50; kill -0 "$$" || exit; done 2>/dev/null &
-SUDO_KEEPALIVE_PID=$!
-trap 'kill $SUDO_KEEPALIVE_PID 2>/dev/null' EXIT
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Function to print colored output
@@ -42,11 +29,82 @@ print_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
+print_header() {
+    echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${MAGENTA}$1${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+}
+
+# ── Spinner / animated progress ─────────────────────────────────────────────────
+# Runs a command in the background with a fun animated spinner in front of it,
+# hiding its (often very noisy) stdout/stderr unless it actually fails - in which
+# case the captured output is dumped so you can debug it.
+SPINNER_FRAMES=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+
+run_spinner() {
+  local msg="$1"; shift
+  local logfile
+  logfile=$(mktemp)
+  "$@" > "$logfile" 2>&1 &
+  local pid=$!
+  local i=0
+  tput civis 2>/dev/null || true
+  while kill -0 "$pid" 2>/dev/null; do
+    local frame="${SPINNER_FRAMES[$((i % ${#SPINNER_FRAMES[@]}))]}"
+    printf "\r${CYAN}%s${NC} %s" "$frame" "$msg"
+    i=$((i + 1))
+    sleep 0.08
+  done
+  tput cnorm 2>/dev/null || true
+  local status=0
+  wait "$pid" || status=$?
+  if [[ $status -eq 0 ]]; then
+    printf "\r${GREEN}✓${NC} %s\n" "$msg"
+  else
+    printf "\r${RED}✗${NC} %s (failed)\n" "$msg"
+    echo -e "${YELLOW}--- output ---${NC}"
+    cat "$logfile"
+    echo -e "${YELLOW}--------------${NC}"
+  fi
+  rm -f "$logfile"
+  return $status
+}
+
+print_header "Homebrew Application Installation Script"
+echo -e "${CYAN}Author: mrfixit027 | https://github.com/peeweeh/pc-setup${NC}\n"
+
+# ── Refuse to run as root ────────────────────────────────────────────────────────
+# Homebrew itself refuses to run as root, but other steps here (Oh My Zsh install,
+# .zshrc edits) don't - and on macOS, `sudo <script>` preserves the invoking user's
+# $HOME by default, so running this with sudo silently creates root-owned files
+# inside YOUR home directory (e.g. ~/.oh-my-zsh), breaking later plugin installs
+# with "Permission denied". Always run this script as your normal user; individual
+# commands that need elevation prompt for sudo themselves.
+if [[ "${EUID}" -eq 0 ]]; then
+  print_error "Do not run this script with sudo or as root."
+  echo "        Run it as your normal user: ./brew_install.sh"
+  exit 1
+fi
+
+# ── Sudo keep-alive ─────────────────────────────────────────────────────────────
+# Some cask installs need sudo (e.g. microsoft-office, docker-desktop).
+# Ask once upfront and keep the session alive in the background.
+echo ""
+print_warning "Some Homebrew casks require sudo. Enter your password once now"
+echo -e "       and it will be kept alive for the rest of the install.\n"
+sudo -v
+# Background loop: refresh sudo timestamp every 50s until this script exits
+while true; do sudo -n true; sleep 50; kill -0 "$$" || exit; done 2>/dev/null &
+SUDO_KEEPALIVE_PID=$!
+trap 'kill $SUDO_KEEPALIVE_PID 2>/dev/null' EXIT
+
 # Check if Homebrew is installed, install if not
 if ! command -v brew &> /dev/null; then
     print_warning "Homebrew not found. Installing Homebrew..."
+    # Not spinner-wrapped: the official installer needs interactive confirmation
+    # (RETURN key press, password prompt) - hiding its output could hang silently.
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    
+
     # Add Homebrew to PATH for Apple Silicon Macs
     if [[ $(uname -m) == 'arm64' ]]; then
         echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
@@ -57,17 +115,15 @@ else
 fi
 
 # Update and upgrade Homebrew
-print_info "Updating Homebrew..."
-brew update
-brew upgrade
+run_spinner "Updating Homebrew..." brew update
+run_spinner "Upgrading existing Homebrew packages..." brew upgrade
 
 # ── App Tiers ───────────────────────────────────────────────────────────────────
-#   Essential    = core utilities + web-dev tools (always included)
-#   Productivity = Essential + browsers, comms, productivity (no heavy stuff)
-#   Everything   = all of the above + office, cloud, enterprise, heavy apps
+#   Fast = everything except large/slow installs (office suites, Docker, VMs, games)
+#   Slow = Fast + the heavy stuff that takes a long time to download/install
 
-# ── Tier 1: Essential ───────────────────────────────────────────────────────────
-essential_apps=(
+# ── Tier 1: Fast (core utilities, dev tools, browsers, comms, productivity) ────
+fast_apps=(
   # Core utilities
   1password
   1password-cli
@@ -88,20 +144,8 @@ essential_apps=(
   warp
   fig
   devtoys
-  gh
   copilot-cli
 
-  # Python linters / formatters
-  ruff
-  vulture
-  black
-  isort
-  flake8
-  docker-desktop
-)
-
-# ── Tier 2: Productivity (adds on top of Essential) ────────────────────────────
-productivity_apps=(
   # Browsers
   brave-browser
   google-chrome
@@ -122,8 +166,8 @@ productivity_apps=(
   zoom
 )
 
-# ── Tier 3: Everything (adds on top of Productivity) ───────────────────────────
-everything_apps=(
+# ── Tier 2: Slow (adds on top of Fast - large/slow installs) ───────────────────
+slow_apps=(
   # Cloud & VPN
   protonvpn
   proton-mail
@@ -139,8 +183,8 @@ everything_apps=(
   # Enterprise
   amazon-workspaces
 
-  # Heavy / large installs
-  
+  # Docker & heavy / large installs
+  docker-desktop
   figma
   home-assistant
   istat-menus
@@ -153,50 +197,45 @@ echo -e "${GREEN}╔════════════════════
 echo -e "${GREEN}║          Choose What to Install                            ║${NC}"
 echo -e "${GREEN}╠══════════════════════════════════════════════════════════════╣${NC}"
 echo -e "${GREEN}║                                                            ║${NC}"
-echo -e "${GREEN}║  1) Essential      – Dev tools & core utilities            ║${NC}"
-echo -e "${GREEN}║     1password, arc, vscode, raycast, postman, etc.        ║${NC}"
-echo -e "${GREEN}║     (~25 apps, ~5 min)                                     ║${NC}"
-echo -e "${GREEN}║                                                            ║${NC}"
-echo -e "${GREEN}║  2) Productivity   – Essential + browsers & comms          ║${NC}"
-echo -e "${GREEN}║     + chrome, brave, slack, discord, obsidian, zoom        ║${NC}"
+echo -e "${GREEN}║  1) Fast   – Dev tools, browsers, comms, productivity      ║${NC}"
+echo -e "${GREEN}║     1password, arc, vscode, raycast, chrome, slack, etc.  ║${NC}"
 echo -e "${GREEN}║     (~40 apps, ~15-20 min)                                 ║${NC}"
 echo -e "${GREEN}║                                                            ║${NC}"
-echo -e "${GREEN}║  3) Everything     – All 50+ apps                          ║${NC}"
-echo -e "${GREEN}║     + office, cloud, docker, figma, steam, etc.           ║${NC}"
-echo -e "${GREEN}║     (~50+ apps, ~30-60 min)                                ║${NC}"
+echo -e "${GREEN}║  2) Slow   – Fast + Office, Docker, cloud, and other       ║${NC}"
+echo -e "${GREEN}║     large/slow installs (figma, steam, VPNs, etc.)        ║${NC}"
+echo -e "${GREEN}║     (~55+ apps, ~40-70 min)                                ║${NC}"
 echo -e "${GREEN}║                                                            ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
 while true; do
-  read -rp "Enter choice [1, 2, or 3]: " install_mode
+  read -rp "Enter choice [1 or 2]: " install_mode
   case "$install_mode" in
-    1|2|3) break ;;
-    *) print_warning "Please enter 1, 2, or 3" ;;
+    1|2) break ;;
+    *) print_warning "Please enter 1 or 2" ;;
   esac
 done
 
 # Build the final app list (tiers are cumulative)
-apps_to_install=("${essential_apps[@]}")
+apps_to_install=("${fast_apps[@]}")
 
 if [[ "$install_mode" -ge 2 ]]; then
-  apps_to_install+=("${productivity_apps[@]}")
-fi
-
-if [[ "$install_mode" -ge 3 ]]; then
-  apps_to_install+=("${everything_apps[@]}")
+  apps_to_install+=("${slow_apps[@]}")
 fi
 
 echo ""
 print_info "Installing ${#apps_to_install[@]} applications..."
+
+# Snapshot existing user LaunchAgents so we can tell which ones get added by the
+# casks we're about to install (used later to disable their auto-start behavior).
+BEFORE_LAUNCH_AGENTS=$(ls "$HOME/Library/LaunchAgents" 2>/dev/null || true)
 
 # Install selected applications using Homebrew Cask
 for app in "${apps_to_install[@]}"; do
   if brew list --cask | grep -q "^${app}\$"; then
     print_warning "$app is already installed, skipping..."
   else
-    print_info "Installing $app..."
-    brew install --cask "$app" || print_error "Failed to install $app"
+    run_spinner "Installing $app..." brew install --cask "$app" || print_error "Failed to install $app"
   fi
 done
 
@@ -214,8 +253,7 @@ for font in "${fonts[@]}"; do
   if brew list --cask | grep -q "^${font}\$"; then
     print_warning "$font is already installed, skipping..."
   else
-    print_info "Installing $font..."
-    brew install --cask "$font" || print_error "Failed to install $font"
+    run_spinner "Installing $font..." brew install --cask "$font" || print_error "Failed to install $font"
   fi
 done
 
@@ -232,8 +270,7 @@ fi
 # with its own default template (backing up any existing file), so it must run first -
 # otherwise it would wipe out the Powerlevel10k/alias customizations added further down.
 if [[ ! -d ~/.oh-my-zsh ]]; then
-    print_info "Installing Oh My Zsh..."
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    run_spinner "Installing Oh My Zsh..." sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 else
     print_warning "Oh My Zsh already installed, skipping..."
 fi
@@ -278,12 +315,12 @@ if [[ -d ~/.oh-my-zsh ]]; then
     
     # Install zsh-syntax-highlighting
     if [[ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting ]]; then
-        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+        run_spinner "Installing zsh-syntax-highlighting plugin..." git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
     fi
     
     # Install zsh-autosuggestions
     if [[ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions ]]; then
-        git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+        run_spinner "Installing zsh-autosuggestions plugin..." git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
     fi
     
     # Update plugins in .zshrc
@@ -328,6 +365,7 @@ cli_tools=(
   docker-completion
   eza
   fzf
+  gh
   go
   node
   ollama
@@ -338,48 +376,78 @@ cli_tools=(
   telnet
   tree
   uv
+
+  # Python linters / formatters (formulas, not casks)
+  ruff
+  black
+  isort
+  flake8
+  vulture
 )
 
 for tool in "${cli_tools[@]}"; do
   if brew list --formula | grep -q "^${tool}\$"; then
     print_warning "$tool is already installed, skipping..."
   else
-    print_info "Installing $tool..."
-    brew install "$tool" || print_error "Failed to install $tool"
+    run_spinner "Installing $tool..." brew install "$tool" || print_error "Failed to install $tool"
   fi
 done
 
-# Stop auto-starting services for heavy applications
-print_info "Configuring services to not auto-start..."
+# ── No background activity ──────────────────────────────────────────────────────
+# Many of the apps above (Docker, cloud-sync clients, chat apps, VPNs) add
+# themselves as login items or install background LaunchAgents during
+# installation. Strip all of that so nothing runs in the background unless you
+# explicitly open it.
+print_info "Disabling background/auto-start activity for installed apps..."
 
-# Stop and disable Docker Desktop auto-start
-if brew list --cask | grep -q "docker-desktop"; then
-  print_info "Disabling Docker Desktop auto-start..."
-  osascript -e 'tell application "System Events" to delete login item "Docker"' 2>/dev/null || true
+# 1) Remove every current login item (System Events "Open at Login" list).
+#    This covers most apps that register themselves this way (Docker, OneDrive,
+#    Google Drive, Slack, Discord, Zoom, ChatGPT, Claude, VPN clients, etc.).
+login_items=$(osascript -e 'tell application "System Events" to get the name of every login item' 2>/dev/null || true)
+if [[ -n "$login_items" ]]; then
+  IFS=', ' read -ra items_array <<< "$login_items"
+  for item in "${items_array[@]}"; do
+    [[ -z "$item" ]] && continue
+    print_info "Removing login item: $item"
+    osascript -e "tell application \"System Events\" to delete login item \"$item\"" 2>/dev/null || true
+  done
+else
+  print_info "No login items found."
 fi
 
-# Stop and disable Ollama service
-if brew list --formula | grep -q "ollama"; then
-  print_info "Stopping Ollama service..."
+# 2) Disable any user LaunchAgents that appeared during this run (cask installers
+#    often drop a background helper agent here even when it's not a login item).
+AFTER_LAUNCH_AGENTS=$(ls "$HOME/Library/LaunchAgents" 2>/dev/null || true)
+new_agents=$(comm -13 <(echo "$BEFORE_LAUNCH_AGENTS" | sort) <(echo "$AFTER_LAUNCH_AGENTS" | sort))
+if [[ -n "$new_agents" ]]; then
+  while IFS= read -r agent_file; do
+    [[ -z "$agent_file" ]] && continue
+    plist_path="$HOME/Library/LaunchAgents/$agent_file"
+    label=$(plutil -extract Label raw -o - "$plist_path" 2>/dev/null || true)
+    if [[ -n "$label" ]]; then
+      print_info "Disabling background agent: $label"
+      launchctl bootout "gui/$(id -u)/$label" 2>/dev/null || true
+      launchctl disable "gui/$(id -u)/$label" 2>/dev/null || true
+    fi
+  done <<< "$new_agents"
+else
+  print_info "No new background agents detected."
+fi
+
+# 3) Explicitly stop any Homebrew services that may have been auto-started
+#    (e.g. `brew services start ollama` run previously).
+if command -v ollama &>/dev/null; then
   brew services stop ollama 2>/dev/null || true
 fi
 
-# Stop and disable VPN auto-start
-for vpn in nordvpn protonvpn; do
-  if brew list --cask | grep -q "$vpn"; then
-    print_info "Disabling $vpn auto-start..."
-    osascript -e "tell application \"System Events\" to delete login item \"$vpn\"" 2>/dev/null || true
-  fi
-done
-
-print_info "Services configured for manual start"
+print_info "Background/auto-start activity disabled for installed apps."
+print_info "Open any app manually when you actually need it."
 
 # Cleanup
-print_info "Cleaning up..."
-brew cleanup
+run_spinner "Cleaning up Homebrew caches..." brew cleanup
 
 print_info "${GREEN}Installation complete!${NC}"
 print_info "Please restart your terminal or run: source ~/.zshrc"
 print_info ""
-print_info "Note: Docker Desktop, Ollama, and VPN services are set to manual start."
-print_info "Start them manually when needed."
+print_info "Note: all installed apps' login items and background agents have been"
+print_info "disabled. Open any app manually when you actually need it."
