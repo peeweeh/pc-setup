@@ -327,32 +327,27 @@ else
   print_error "Failed to download Nord.terminal file"
 fi
 
-# Pick a Nerd Font installed by brew_install.sh so Powerlevel10k/eza icons render
-# correctly instead of showing as "[?]" tofu boxes. Hack Nerd Font is preferred (falls
-# back to Fira Code Nerd Font if Hack isn't present, e.g. brew_install.sh wasn't run,
-# or install failed).
-#
-# IMPORTANT: Terminal.app's AppleScript "font name" property requires the font's actual
-# PostScript name (e.g. "HackNFM-Regular"), NOT the .ttf filename (e.g.
-# "HackNerdFontMono-Regular") - passing the filename fails silently (no error, font just
-# doesn't change). Use `system_profiler SPFontsDataType` on the .ttf to find the correct
-# PostScript name if these fonts are ever updated/renamed upstream.
-NERD_FONT_FILE="HackNerdFontMono-Regular"
-NERD_FONT_PSNAME="HackNFM-Regular"
+# Use the PostScript font name, not the filename or family name.
+NERD_FONT_FILE="FiraCodeNerdFontMono-Regular"
+NERD_FONT_PSNAME="FiraCodeNFM-Reg"
 if [[ ! -f "$HOME/Library/Fonts/${NERD_FONT_FILE}.ttf" ]] && [[ ! -f "/Library/Fonts/${NERD_FONT_FILE}.ttf" ]]; then
-  NERD_FONT_FILE="FiraCodeNerdFontMono-Regular"
-  NERD_FONT_PSNAME="FiraCodeNFM-Reg"
+  NERD_FONT_FILE="HackNerdFontMono-Regular"
+  NERD_FONT_PSNAME="HackNFM-Regular"
 fi
 
 if [[ -f "$HOME/Library/Fonts/${NERD_FONT_FILE}.ttf" ]] || [[ -f "/Library/Fonts/${NERD_FONT_FILE}.ttf" ]]; then
   print_info "Applying Nerd Font '${NERD_FONT_FILE}' to your current profile ('${CURRENT_DEFAULT_PROFILE}') - theme/colors untouched..."
-  if osascript <<OSA
-tell application "Terminal"
-  try
-    set font name of settings set "${CURRENT_DEFAULT_PROFILE}" to "${NERD_FONT_PSNAME}"
-    set font size of settings set "${CURRENT_DEFAULT_PROFILE}" to 13
-  end try
-end tell
+  if osascript - "$CURRENT_DEFAULT_PROFILE" "$NERD_FONT_PSNAME" <<'OSA'
+on run argv
+  set profileName to item 1 of argv
+  set desiredFont to item 2 of argv
+  tell application "Terminal"
+    set font name of settings set profileName to desiredFont
+    if font name of settings set profileName is not desiredFont then
+      error "Terminal did not retain the requested Nerd Font"
+    end if
+  end tell
+end run
 OSA
   then
     print_info "Nerd Font applied to '${CURRENT_DEFAULT_PROFILE}'. Open a new Terminal window/tab to see icons correctly."

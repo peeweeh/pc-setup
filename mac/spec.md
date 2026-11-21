@@ -12,9 +12,10 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 ```
 
 Then select from the menu:
-1. **Install Applications** (brew_install.sh)
-2. **Optimize System & Harden Privacy** (mac_optimize.sh)
-3. **Install ALL** (recommended for fresh Mac)
+1. **Install Light** (core apps, development tools and fonts)
+2. **Install Heavy** (Light plus Office, Docker, cloud and other large apps)
+3. **Install Optimizations** (system and privacy hardening)
+4. **Install ALL** (Heavy followed by optimizations)
 
 ---
 
@@ -25,9 +26,9 @@ Then select from the menu:
 
 **Features**:
 - Colored menu interface
-- 3 installation options
-- Downloads scripts from GitHub
-- Handles sudo elevation automatically
+- 4 installation options
+- Uses local scripts when available, otherwise downloads from GitHub
+- Prompts for authorization when required
 - Progress tracking
 
 **Run directly**:
@@ -42,17 +43,21 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 
 **What it does**:
 - Installs Homebrew (if needed)
-- Installs 40+ applications (1Password, Arc, VS Code, Docker, Git, Node, etc)
+- Installs 40+ applications (1Password, Helium, VS Code, Docker, Git, Node, etc)
 - Installs 20+ CLI tools (bat, fzf, btop, ripgrep, eza, etc)
+- Installs Hermes Agent using its official shell installer
+- Installs missing Word, Excel, PowerPoint and Outlook from signed Microsoft packages
+- Registers Nerd Fonts with macOS and applies one to Terminal's existing profiles
 - Sets up Oh My Zsh with Powerlevel10k
-- Disables auto-start for heavy services (Docker, Ollama, VPNs)
+- Attempts to remove current login items and disable newly added LaunchAgents
 
 **Run directly**:
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/brew_install.sh)
+# Or pass light or heavy to select a tier directly
 ```
 
-**Time**: 5-10 minutes
+**Time**: approximately 15-70 minutes, depending on tier and downloads
 
 ---
 
@@ -98,7 +103,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 ### Install Everything (Fresh Mac Setup)
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
-# Select option 3, then choose tier 2 (Slow) when prompted by brew_install.sh
+# Select option 4 and confirm the optimization and privacy changes
 ```
 
 ### Run Script from Cloned Repository
@@ -113,37 +118,55 @@ chmod +x *.sh
 
 ## Applications Installed
 
-`brew_install.sh` prompts for a tier (Fast or Slow); Slow installs everything in
-Fast plus the heavier/slower items.
+`brew_install.sh` prompts for a tier (Light or Heavy); Heavy installs everything in
+Light plus the heavier/slower items. The main menu passes the selected tier directly.
 
-**Fast tier**:
-- Core utilities: 1Password, Arc, Comet, BetterMouse, Clipy, Moom, Rectangle, Raycast, The Unarchiver
+**Light tier**:
+- Core utilities: 1Password, Comet, BetterMouse, Clipy, Moom, Rectangle, Raycast, Task Manager TMOG, The Unarchiver
 - Dev tools: GitHub Desktop, Postman, Sourcetree, VS Code, Warp, DevToys, Copilot CLI
-- Browsers: Brave, Google Chrome
+- Browsers: Brave, Google Chrome, Helium
 - Communication: Signal, Telegram, WhatsApp, Discord, Slack, Beeper
-- Productivity: ChatGPT, Claude, Obsidian, VLC, Zoom
+- Productivity: ChatGPT, Claude, Obsidian, Perplexity, VLC, Zoom
 
-**Slow tier** (adds on top of Fast):
+**Heavy tier** (adds on top of Light):
 - Cloud & VPN: ProtonVPN, Proton Mail, Proton Drive, Google Drive, OneDrive
-- Microsoft Office, Teams, Remote Desktop
+- Microsoft Word, Excel, PowerPoint, Outlook, Teams and Windows App
 - Amazon Workspaces
-- Docker Desktop, Figma, Home Assistant, iStat Menus, Steam
+- Docker Desktop, Figma, Home Assistant, iStat Menus, Steam and Yogurt
+
+Office apps already present are left untouched, including Mac App Store installs.
+Missing apps are installed individually from Microsoft after checking their signatures.
+Yogurt is installed through its official Homebrew tap, with the release checksum
+verified; it requires Apple Silicon and macOS 14.4 or newer.
 
 **CLI Tools** (both tiers):
-- git, gh, awscli, aws-nuke, bat, btop, diff-so-fancy, docker, eza, fzf, go, node,
-  ollama, pandoc, pipx, powerlevel10k, serverless, telnet, tree, uv
+- actionlint, git, gh, awscli, aws-nuke, bash, bat, btop, coreutils,
+  diff-so-fancy, docker, eza, fontconfig, fzf, go, node, ollama, pandoc, pipx,
+  powerlevel10k, Python 3.14 and 3.15, ripgrep, serverless, tailscale, telnet,
+  tirith, tree, uv
 - Python linters/formatters: ruff, black, isort, flake8, vulture
+- Hermes Agent via its official shell installer; run `hermes setup` to configure it
+
+Both tiers also include the current Homebrew formula inventory, including dependency
+libraries. On a new Mac these may be marked as explicitly installed by Homebrew.
+Hermes is the exception: it uses the official shell installer instead of its formula.
 
 **Fonts**:
 - Fira Code, Fira Code Nerd Font, Hack Nerd Font
 
-**Background activity**: after installing, `brew_install.sh` removes all login
+**Background activity**: after installing, `brew_install.sh` attempts to remove all login
 items and disables any newly-added background LaunchAgents, so nothing runs
 in the background automatically - open apps manually when you need them.
 
 ---
 
 ## Troubleshooting
+
+### Test Installer Changes
+```bash
+bash mac/test_install.sh
+```
+The tests use isolated mock commands; they do not install applications or run optimizations.
 
 ### Script Won't Run
 ```bash
@@ -166,18 +189,18 @@ source ~/.zprofile
 ```
 
 ### Icons Show as Boxes/`[?]` (Powerlevel10k, `eza --icons`)
-The Nerd Fonts installed by `brew_install.sh` (Fira Code Nerd Font, Hack Nerd Font) are
-correctly placed in `~/Library/Fonts`, but macOS Terminal.app doesn't automatically switch
-to them. `mac_optimize.sh`'s Terminal theme step now applies a Nerd Font to the Nord/Basic
-Terminal profiles automatically (run `brew_install.sh` **before** `mac_optimize.sh`, which
-is the default order in `install.sh`'s "Install ALL" flow). If icons still look wrong:
+`brew_install.sh` registers Fira Code and Hack with macOS and applies FiraCode Nerd Font
+Mono to Terminal's default and startup profiles without changing their colors or font
+sizes. If icons still look wrong, open a new terminal tab or restart the terminal:
 ```bash
 # Verify the fonts are actually installed
 ls ~/Library/Fonts | grep -i nerd
 
 # Manually set the font: Terminal > Settings > Profiles > Text > Font
-# Choose "Hack Nerd Font Mono" (default) or "FiraCode Nerd Font Mono"
+# Choose "FiraCode Nerd Font Mono" or "Hack Nerd Font Mono"
 ```
+For VS Code, set `terminal.integrated.fontFamily` to `'FiraCode Nerd Font Mono'`.
+Other terminals, including Warp, may need the font selected in their settings.
 
 ### Permission Denied
 ```bash
@@ -206,7 +229,7 @@ sudo mdutil -i on -a
 
 | Script | Installs | Configures | Disables | Time |
 |--------|----------|-----------|----------|------|
-| **brew_install.sh** | 40+ apps, 20+ CLIs, fonts | Oh My Zsh, shell aliases | Docker/Ollama/VPN auto-start | 5-10m |
+| **brew_install.sh** | Apps, CLIs, Hermes, fonts | Oh My Zsh, shell aliases | Login items and new LaunchAgents | 15-70m |
 | **mac_optimize.sh** | — | Dock, Finder, keyboard, terminal, firewall | Siri, telemetry, Photos AI, animations | 5-10m |
 
 ---

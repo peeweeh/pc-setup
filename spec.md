@@ -17,8 +17,8 @@ The PC Setup project provides modular, automated setup scripts for Windows and m
 
 ### Windows Execution Order (Recommended)
 
-1. **windows_install.ps1** - Install essential packages (required)
-2. **vscode_extensions.ps1** - Install VS Code extensions (optional)
+1. **install.ps1** - Choose Light, Heavy, Optimizations, or All
+2. **dev_setup.ps1** - Optional standalone development setup
 
 ---
 
@@ -34,8 +34,8 @@ The PC Setup project provides modular, automated setup scripts for Windows and m
 
 **Features:**
 - Beautiful colored menu interface with emoji status indicators
-- 3 installation options: Applications, System Optimization + Privacy, or All
-- Downloads scripts dynamically from GitHub (no pre-cloning required)
+- 4 installation options: Light, Heavy, Optimizations, or All
+- Uses local scripts when available, otherwise downloads from GitHub
 - Proper sudo elevation for mac_optimize.sh
 - Progress tracking with colored output (✓ ✗ ⚠)
 - Comprehensive error handling
@@ -43,9 +43,10 @@ The PC Setup project provides modular, automated setup scripts for Windows and m
 
 **Menu Options:**
 ```
-1️⃣  Install Applications (brew_install.sh) - 40+ apps via Homebrew
-2️⃣  Optimize System & Harden Privacy (mac_optimize.sh) - Performance, UI & privacy tweaks
-3️⃣  Install ALL - Run all scripts in sequence
+1️⃣  Install Light - Core apps, developer tools, fonts and shell
+2️⃣  Install Heavy - Light plus Office, Docker, cloud and other large apps
+3️⃣  Install Optimizations - Performance, UI & privacy tweaks
+4️⃣  Install ALL - Heavy followed by optimizations
 ```
 
 **Execution:**
@@ -68,28 +69,38 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
 
 ### 1.2 brew_install.sh (Application Installation)
 
-**Purpose:** Install applications and development tools via Homebrew package manager.
+**Purpose:** Install applications and development tools using Homebrew and official installers.
 
 **Location**: `/mac/brew_install.sh`
 
 **Features:**
 - **Automatic Homebrew installation** if not present (includes Apple Silicon PATH setup)
-- **Two install tiers**, prompted interactively (Slow includes everything in Fast plus more):
-  - **Fast** (~30 apps): 1Password, Arc, Comet, BetterMouse, Clipy, Moom, Rectangle,
-    Raycast, The Unarchiver, GitHub Desktop, Postman, Sourcetree, VS Code, Warp, Fig,
-    DevToys, Copilot CLI, Brave, Google Chrome, Signal, Telegram, WhatsApp, Discord,
-    Slack, Beeper, ChatGPT, Claude, Obsidian, VLC, Zoom
-  - **Slow** (adds ~14 more apps): ProtonVPN, Proton Mail, Proton Drive, Google Drive,
-    OneDrive, Microsoft Office, Teams, Remote Desktop, Amazon Workspaces, Docker
-    Desktop, Figma, Home Assistant, iStat Menus, Steam
+- **Two install tiers**, prompted interactively or selected with `light` / `heavy`:
+  - **Light**: 1Password, Comet, BetterMouse, Clipy, Moom, Rectangle,
+    Raycast, Task Manager TMOG, The Unarchiver, GitHub Desktop, Postman, Sourcetree,
+    VS Code, Warp, DevToys, Copilot CLI, Brave, Google Chrome, Helium, Signal,
+    Telegram, WhatsApp, Discord, Slack, Beeper, ChatGPT, Claude, Obsidian, Perplexity, VLC, Zoom
+  - **Heavy** adds ProtonVPN, Proton Mail, Proton Drive, Google Drive, OneDrive,
+    Microsoft Word, Excel, PowerPoint, Outlook, Teams, Windows App, Amazon Workspaces,
+    Docker Desktop, Figma, Home Assistant, iStat Menus, Steam and Yogurt
 
-- **CLI Tools** (20+ formulae, both tiers): git, gh, awscli, aws-nuke, bat, btop,
-  diff-so-fancy, docker, eza, fzf, go, node, ollama, pandoc, pipx, powerlevel10k,
-  serverless, telnet, tree, uv, plus Python linters/formatters (ruff, black, isort,
-  flake8, vulture)
+- **Microsoft Office**: preserves existing apps and downloads missing apps directly
+  from Microsoft, verifying the installer signature before installation.
+- **Yogurt**: installed from its official Homebrew tap with release checksum verification;
+  requires Apple Silicon and macOS 14.4+.
 
-- **Fonts**: Fira Code, Fira Code Nerd Font, Hack Nerd Font (with quarantine-flag
-  stripping so they actually register with macOS)
+- **CLI Tools** (both tiers): actionlint, git, gh, awscli, aws-nuke, bash, bat, btop,
+  coreutils, diff-so-fancy, docker, eza, fontconfig, fzf, go, node, ollama, pandoc, pipx,
+  powerlevel10k, Python 3.14 and 3.15, ripgrep, serverless, tailscale, telnet, tirith, tree, uv, plus Python
+  linters/formatters (ruff, black, isort, flake8, vulture).
+- **Hermes Agent**: installed with the official shell installer, preserving any
+  existing source installation; configure it with `hermes setup`.
+- **Formula inventory**: both tiers also install the current Homebrew dependency
+  libraries explicitly, so Homebrew may mark them as requested on a new Mac.
+
+- **Fonts**: Fira Code, Fira Code Nerd Font, Hack Nerd Font. Registers the fonts
+  with macOS and applies FiraCode Nerd Font Mono to Terminal's default and startup
+  profiles. Other terminals may require selecting the font in their settings.
 
 - **Shell Configuration**:
   - Oh My Zsh installation and configuration (run before `.zshrc` customization so it
@@ -99,12 +110,12 @@ bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/
   - zsh-autosuggestions plugin
   - Custom aliases (eza for ls, bat for cat, fzf_cd for smart navigation)
 
-- **Background Activity Disabled** - after installing, removes all login items and
+- **Background Activity Disabled** - after installing, attempts to remove all login items and
   disables any newly-added LaunchAgents so nothing auto-starts; open apps manually
   when you need them.
 
-- **Animated Progress** - a spinner hides Homebrew's noisy default output; only shown
-  if an install actually fails, so you can see what went wrong.
+- **Progress** - a spinner is used for non-interactive steps; casks and privileged
+  installers show their output and authorization prompts.
 
 - **Idempotent Design** - Safe to run multiple times
   - Checks if packages already installed before installing
@@ -149,8 +160,8 @@ chmod +x brew_install.sh
   - ✓ (GREEN) - Installation successful
   - ✗ (RED) - Installation failed
   - ⚠ (YELLOW) - Already installed, skipping
-- Animated spinner during each install; only reveals output on failure
-- Final summary with completion time
+- Progress messages and visible authorization prompts
+- Final summary of any failed installations
 - Next step suggestion (run mac_optimize.sh for optimization & privacy hardening)
 
 ---
@@ -308,16 +319,13 @@ chmod +x mac_optimize.sh
 **Purpose:** Main package installation script that sets up essential software using Chocolatey.
 
 **Features:**
-- Automatic GPU detection (NVIDIA/AMD) for driver installation
-- Three-tier package installation:
-  - **Essential Packages** (18 items): Critical applications (1password, Brave, Discord, git, VS Code, VLC, WinRAR, etc.)
-  - **Optional Packages** (56+ items): Nice-to-have applications (Discord, Telegram, Signal, Steam, Postman, etc.)
-  - **GPU Drivers**: NVIDIA packages (if detected) - nvidia-app, nvidia-physx
-- User prompts to skip optional package groups
-- Success/failure tracking with detailed summary
+- Light and Heavy package tiers; Heavy includes Light plus larger applications
+- Chocolatey packages, Nerd Fonts and the official Hermes shell installer
+- NVIDIA packages in Heavy when detected; AMD drivers are manual
+- Success/failure tracking with an unsuccessful exit on package failures
 
 **Key Functions:**
-- `Install-PackageGroup` - Handles categorized installation with user prompts
+- `Install-PackageGroup` - Installs selected packages and records failures
 
 **Requirements:**
 - Administrator privileges
@@ -326,17 +334,50 @@ chmod +x mac_optimize.sh
 
 **Execution:**
 ```powershell
-powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1"
+powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1" -Tier heavy
 ```
 
-### 2.2 vscode_extensions.ps1
+### 2.2 windows_optimize.ps1
 
-**Purpose:** Install VS Code extensions on Windows.
+Requests privacy policies for diagnostics, advertising, update peer-sharing,
+clipboard sync, online speech, and web search on supported Windows editions.
+Reviews Customer Experience Improvement Program tasks before disabling any.
+Power, visual effects, Defender and updates are unchanged. Settings are backed
+up; policy effectiveness varies and network traffic remains. See
+[Windows setup](win/spec.md) for edition support and tradeoffs. The legacy
+privacy script is separate. Restore saved settings with:
 
 **Execution:**
 ```powershell
-powershell.exe -ExecutionPolicy Bypass -File ".\win\vscode_extensions.ps1"
+powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_optimize.ps1" -Restore
 ```
+
+---
+
+## Section 3: Omarchy Setup (omarchy/install.sh)
+
+One-time setup for an installed Omarchy 4.5 system. Run it as the desktop user
+(not root). It refuses to run where `omarchy-pkg-add` is unavailable.
+
+**Menu:** Light, Heavy, Optimizations (local Voxtype dictation) and All.
+
+- **Light** installs signed Omarchy-repository packages with `omarchy-pkg-add`:
+  1Password and CLI, Helium, Brave, Chrome, Claude, VS Code, GitHub Copilot CLI,
+  Signal, Telegram, Slack, Obsidian, VLC, actionlint, git-delta, ruff, pipx and the
+  Fira Code and Hack Nerd Fonts.
+- **Heavy** adds Proton VPN, Steam (through `omarchy-install-gaming-steam`, which
+  selects the graphics drivers) and Discord on x86_64 only.
+- **Optimizations** runs `omarchy-install-dictation-voxtype`, which replaces Omarchy's
+  fresh-install cloud dictation with local processing and downloads a model.
+- Microsoft 365 is intentionally skipped. Apps without an Omarchy package (Comet,
+  Perplexity, Raycast and similar) are omitted.
+
+Each package is installed separately, failures are listed at the end, and the script
+exits unsuccessfully. VS Code extensions remain managed by VS Code profiles.
+
+Tests: `bash omarchy/test_install.sh` runs the menu, architecture-specific, failure,
+and non-Omarchy cases using mocked Omarchy commands. Actual installation on Omarchy
+has not been run from this macOS workspace.
 
 ---
 
@@ -354,9 +395,13 @@ pc-setup/
 │   ├── spec.md                 # macOS-specific documentation
 │   ├── brew_install.sh         # Homebrew application installation
 │   └── mac_optimize.sh         # Performance, UI & privacy hardening
+├── omarchy/                     # Omarchy 4.5 one-time setup
+│   ├── install.sh              # Interactive installer
+│   └── test_install.sh         # Mocked installer tests
 └── win/                        # Windows setup scripts
-    ├── windows_install.ps1     # Main Windows setup
-    └── vscode_extensions.ps1   # VS Code extensions
+    ├── install.ps1             # Interactive installer
+    ├── windows_install.ps1     # Application tiers
+    └── windows_optimize.ps1    # Privacy policies and restore
 ```
 
 ---
@@ -430,16 +475,13 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser -Force
 **Purpose:** Main package installation script that sets up essential software using Chocolatey.
 
 **Features:**
-- Automatic GPU detection (NVIDIA/AMD) for driver installation
-- Three-tier package installation:
-  - **Essential Packages** (18 items): Critical applications (1password, Brave, Discord, git, VS Code, VLC, WinRAR, etc.)
-  - **Optional Packages** (56+ items): Nice-to-have applications (Discord, Telegram, Signal, Steam, Postman, etc.)
-  - **GPU Drivers**: NVIDIA packages (if detected) - nvidia-app, nvidia-physx
-- User prompts to skip optional package groups
+- Light and Heavy package tiers, with Heavy including Light
+- NVIDIA packages when detected in Heavy; AMD drivers are manual
+- Hermes via its official Windows shell installer
 - Success/failure tracking with detailed summary
 
 **Key Functions:**
-- `Install-PackageGroup` - Handles categorized installation with user prompts
+- `Install-PackageGroup` - Handles installation and reports failures
 
 **Requirements:**
 - Administrator privileges
@@ -454,12 +496,13 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\windows_install.ps1"
 **Output:**
 - Installation summary with success/failure counts
 - List of failed packages (if any)
-- Prompts user to restart computer
+- Reminds the user to restart if needed
 
 **Notes:**
-- Privacy tweaks have been consolidated into separate `privacy_tweaks.ps1` script
+- Privacy policies are applied separately by `windows_optimize.ps1`; the legacy
+  `privacy_tweaks.ps1` script is not part of the installer
 - This script focuses solely on package installation
-- Temporary files are cleaned up automatically
+- Temporary installer downloads are cleaned up
 
 ---
 
@@ -542,27 +585,9 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\privacy_tweaks.ps1"
 
 ---
 
-## Section 3: vscode_extensions.ps1
+## Section 3: VS Code profiles
 
-**Purpose:** Automated installation of recommended VS Code extensions.
-
-**Features:**
-- Batch installation of productivity extensions
-- Installs extensions from VS Code Marketplace
-- Provides installation summary
-
-**Installation Methods:**
-- Command-line: `code --install-extension <publisher>.<extension>`
-- Marketplace UI: Extensions panel in VS Code
-
-**Execution:**
-```powershell
-powershell.exe -ExecutionPolicy Bypass -File ".\win\vscode_extensions.ps1"
-```
-
-**Requirements:**
-- VS Code installed
-- Internet connection
+The Windows menu does not install extensions. VS Code profiles manage them.
 
 ---
 
@@ -596,11 +621,9 @@ powershell.exe -ExecutionPolicy Bypass -File ".\win\dev_setup.ps1"
 
 ### Privacy Tweaks Consolidation
 
-All privacy and telemetry settings have been consolidated into `privacy_tweaks.ps1` to:
-- **Avoid duplication** - Single source of truth for privacy settings
-- **Improve maintainability** - Changes only need to be made in one place
-- **Better organization** - Clear separation: packages vs. privacy vs. development
-- **User choice** - Users can apply privacy settings independently of package installation
+Privacy settings are separate from package installation. The optimizer applies a
+limited, reversible set of policies; the older, more invasive
+`privacy_tweaks.ps1` is separate and should be reviewed before use.
 
 **Removed from windows_install.ps1:**
 - Telemetry disabling (AllowTelemetry registry keys)
@@ -629,21 +652,16 @@ All privacy and telemetry settings have been consolidated into `privacy_tweaks.p
 
 **Features:**
 - Auto-installs Homebrew if not present (including Apple Silicon PATH setup)
-- Priority app installation (1Password, Arc) for immediate access
-- 40+ essential applications organized by category:
-  - **Priority**: 1Password, Arc
-  - **Utilities**: Alfred, Clipy, Moom, Rectangle, Raycast, BetterMouse
-  - **Browsers**: Chrome, Brave
-  - **Communication**: Slack, Teams, Discord, Signal, WhatsApp
-  - **Development**: GitHub, Postman, Sourcetree, VSCode, Warp, Docker Desktop
-  - **Productivity**: ChatGPT, Claude, Evernote, Obsidian
-  - **Enterprise**: Microsoft Office, Teams, Amazon Chime/Workspaces
-  - **Cloud/VPN**: NordVPN, ProtonVPN, Google Drive, OneDrive
-  - **Heavy Apps**: Docker Desktop, Figma, Steam (installed last)
-- CLI tools (20+ formulae): git, aws-nuke, awscli, bat, btop, docker, eza, fzf, go, node, ollama, etc.
-- Fonts: Fira Code, Fira Code Nerd Font, Hack Nerd Font
+- Light and Heavy tiers, with Heavy including everything in Light
+- Browsers, utilities, development, communication, productivity and cloud apps,
+  including Helium, Task Manager TMOG, Docker Desktop, Microsoft Teams and Yogurt
+- Microsoft Word, Excel, PowerPoint and Outlook installed from signed Microsoft
+  packages when missing; existing copies are preserved
+- CLI tools including git, awscli, actionlint, ripgrep, tailscale and Python;
+  Hermes Agent uses its official shell installer
+- Fira Code and Hack Nerd Fonts registered with macOS and applied to Terminal profiles
 - Shell configuration (Oh My Zsh, Powerlevel10k, zsh plugins)
-- Disables auto-start for heavy services (Docker, Ollama, VPNs)
+- Attempts to remove current login items and disable newly added LaunchAgents
 - Idempotent - safe to run multiple times
 - Colored output with progress tracking
 
@@ -795,7 +813,9 @@ pc-setup/
 │   ├── brew_install.sh   # Homebrew application installation
 │   └── mac_optimize.sh   # Performance, UI & privacy hardening
 └── win/                 # Windows setup scripts
+    ├── install.ps1
     ├── windows_install.ps1
+    ├── windows_optimize.ps1
     ├── privacy_tweaks.ps1
     ├── vscode_extensions.ps1
     └── dev_setup.ps1
@@ -825,8 +845,9 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser -Force
 - Restart computer after running script
 
 ### Reverting Changes
-- Use Windows System Restore point created by windows_install.ps1
-- Manually revert registry changes if needed
+- Run `.\win\windows_optimize.ps1 -Restore` from the same Windows account to
+  restore backed-up privacy settings and approved tasks. Older backups can also
+  restore a saved power plan and visual settings. The legacy privacy script is separate.
 
 ---
 

@@ -1,237 +1,208 @@
-################################################################################
-# install.ps1
-# Master installer for PC Setup automation
-# Interactive menu-driven setup orchestrator
-#
-# Author: @mrfixit027
-# GitHub: https://github.com/peeweeh/pc-setup
-################################################################################
-
-# Check if running as Administrator
-$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-if (-not $isAdmin) {
-    Write-Host ""
-    Write-Host "========================================" -ForegroundColor Red
-    Write-Host "Administrator Privileges Required" -ForegroundColor Red
-    Write-Host "========================================" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "This installer requires Administrator privileges." -ForegroundColor Yellow
-    Write-Host "Please run PowerShell as Administrator and try again." -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "To run as Administrator:" -ForegroundColor Cyan
-    Write-Host "1. Right-click PowerShell" -ForegroundColor Cyan
-    Write-Host "2. Select 'Run as Administrator'" -ForegroundColor Cyan
-    Write-Host "3. Run this script again" -ForegroundColor Cyan
-    Write-Host ""
-    pause
+# Interactive Windows setup
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "Run this installer as Administrator." -ForegroundColor Red
     exit 1
 }
 
-Write-Host ""
-Write-Host "PC Setup Installer by @mrfixit027" -ForegroundColor Cyan
-Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
-Write-Host ""
+$scriptDirectory = $PSScriptRoot
 
-# Determine script location (local or web)
-$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-if ([string]::IsNullOrEmpty($scriptPath)) {
-    # Running from web, download to temp
-    $scriptPath = $env:TEMP
-    $isWebMode = $true
-} else {
-    $isWebMode = $false
+$script:Animate = -not [Console]::IsOutputRedirected -and -not $env:PC_SETUP_NO_ANIM -and -not $env:CI
+
+$script:Banner = @(
+    ' ____   ____   ____  _____ _____ _   _ ____  ',
+    '|  _ \ / ___| / ___|| ____|_   _| | | |  _ \ ',
+    '| |_) | |     \___ \|  _|   | | | | | | |_) |',
+    '|  __/| |___   ___) | |___  | | | |_| |  __/ ',
+    '|_|    \____| |____/|_____| |_|  \___/|_|    '
+)
+
+function Write-Typed {
+    param([string]$Text, [ConsoleColor]$Color = 'Green', [int]$DelayMs = 8)
+    if (-not $script:Animate) {
+        Write-Host $Text -ForegroundColor $Color -NoNewline
+        return
+    }
+    foreach ($char in $Text.ToCharArray()) {
+        Write-Host $char -ForegroundColor $Color -NoNewline
+        Start-Sleep -Milliseconds $DelayMs
+    }
+}
+
+function Write-Boot {
+    param([string]$Text, [string]$Tag, [ConsoleColor]$Color = 'Green')
+    Write-Typed "  $Text " -Color DarkGreen
+    Write-Host "[$Tag]" -ForegroundColor $Color
+    if ($script:Animate) { Start-Sleep -Milliseconds 100 }
+}
+
+function Move-Cursor {
+    param([int]$X, [int]$Y)
+    try {
+        [Console]::SetCursorPosition($X, [Math]::Max(0, $Y))
+        return $true
+    } catch {
+        return $false
+    }
 }
 
 function Show-Banner {
-    Clear-Host
-    Write-Host ""
-    Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host "     PC Setup - Master Installer       " -ForegroundColor Cyan
-    Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host "         by @mrfixit027                " -ForegroundColor Gray
-    Write-Host ""
+    if (-not $script:Animate) {
+        foreach ($line in $script:Banner) { Write-Host $line -ForegroundColor Green }
+        return
+    }
+    $top = [Console]::CursorTop
+    foreach ($line in $script:Banner) {
+        Write-Host $line -ForegroundColor Green
+        Start-Sleep -Milliseconds 50
+    }
+    for ($flash = 0; $flash -lt 2; $flash++) {
+        foreach ($colour in @('White', 'Green')) {
+            if (-not (Move-Cursor -X 0 -Y $top)) { return }
+            foreach ($line in $script:Banner) { Write-Host $line -ForegroundColor $colour }
+            Start-Sleep -Milliseconds 70
+        }
+    }
+}
+
+function Invoke-MatrixRain {
+    if (-not $script:Animate) { return }
+    try {
+        $width = [Console]::WindowWidth
+        $height = [Console]::WindowHeight
+    } catch {
+        $width = 120
+        $height = 30
+    }
+    if ($width -lt 20 -or $height -lt 10) { return }
+    $glyphs = '0123456789ABCDEF<>/\|*+-='
+    $rows = $height - 1
+    $heads = @{}
+    for ($x = 0; $x -lt $width - 1; $x += 2) { $heads[$x] = Get-Random -Minimum 0 -Maximum $rows }
+    [Console]::Clear()
+    :frames for ($frame = 0; $frame -lt 30; $frame++) {
+        foreach ($x in @($heads.Keys)) {
+            $y = $heads[$x]
+            if ($y -gt 0 -and -not (Move-Cursor -X $x -Y ($y - 1))) { break frames }
+            if ($y -gt 0) {
+                [Console]::ForegroundColor = 'DarkGreen'
+                [Console]::Write($glyphs[(Get-Random -Maximum $glyphs.Length)])
+            }
+            if (-not (Move-Cursor -X $x -Y $y)) { break frames }
+            [Console]::ForegroundColor = 'White'
+            [Console]::Write($glyphs[(Get-Random -Maximum $glyphs.Length)])
+            $heads[$x] = if ($y + 1 -ge $rows) { 0 } else { $y + 1 }
+        }
+        Start-Sleep -Milliseconds 40
+    }
+    [Console]::ResetColor()
+    [Console]::Clear()
+}
+
+function Invoke-Party {
+    if (-not $script:Animate) {
+        Write-Host 'Party mode needs an interactive console.' -ForegroundColor Yellow
+        return
+    }
+    Invoke-MatrixRain
+    $colours = @('Red', 'Yellow', 'Green', 'Cyan', 'Blue', 'Magenta', 'White')
+    foreach ($line in $script:Banner) { Write-Host $line }
+    $top = [Console]::CursorTop - $script:Banner.Count
+    for ($i = 0; $i -lt 28; $i++) {
+        if (-not (Move-Cursor -X 0 -Y $top)) { break }
+        $colour = $colours[$i % $colours.Count]
+        foreach ($line in $script:Banner) { Write-Host $line -ForegroundColor $colour }
+        Start-Sleep -Milliseconds 80
+    }
+    [Console]::Clear()
+}
+
+function Write-MenuItem {
+    param([string]$Key, [string]$Text)
+    Write-Host "  [$Key] " -NoNewline -ForegroundColor White
+    Write-Typed $Text -DelayMs 4
+    Write-Host ''
 }
 
 function Show-Menu {
-    Write-Host "Select components to install:" -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "  [1] Windows Package Installation" -ForegroundColor White
-    Write-Host "      - 74 packages via Chocolatey" -ForegroundColor Gray
-    Write-Host "      - Essential + Optional packages" -ForegroundColor Gray
-    Write-Host "      - GPU detection and driver installation" -ForegroundColor Gray
-    Write-Host "      - Estimated time: 30-60 minutes" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "  [2] Privacy and Security Tweaks" -ForegroundColor White
-    Write-Host "      - 80+ registry modifications" -ForegroundColor Gray
-    Write-Host "      - App permission controls" -ForegroundColor Gray
-    Write-Host "      - Telemetry and tracking disabled" -ForegroundColor Gray
-    Write-Host "      - Estimated time: 5-10 minutes" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "  [3] VS Code Extensions" -ForegroundColor White
-    Write-Host "      - Productivity extensions" -ForegroundColor Gray
-    Write-Host "      - Development tools" -ForegroundColor Gray
-    Write-Host "      - Estimated time: 5 minutes" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "  [4] Development Environment Setup" -ForegroundColor White
-    Write-Host "      - WSL2, Docker Desktop" -ForegroundColor Gray
-    Write-Host "      - Node.js, Python, Git" -ForegroundColor Gray
-    Write-Host "      - AWS CLI and tools" -ForegroundColor Gray
-    Write-Host "      - Estimated time: 15-30 minutes" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "  [5] ALL OF THE ABOVE" -ForegroundColor Green
-    Write-Host "      - Complete system setup (60-120 minutes)" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "  [Q] Quit" -ForegroundColor Red
-    Write-Host ""
+    Write-MenuItem '1' 'Install Light - core apps, developer tools and fonts'
+    Write-MenuItem '2' 'Install Heavy - Light plus cloud, Docker, games and other large apps'
+    Write-MenuItem '3' 'Install Optimizations - privacy policies and optional background-task review'
+    Write-MenuItem '4' 'Install All - Heavy followed by optimizations'
+    Write-MenuItem '0' 'Exit'
 }
 
-function Run-Script {
-    param(
-        [string]$ScriptName,
-        [string]$Description
-    )
-    
-    Write-Host ""
-    Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host "$Description" -ForegroundColor Cyan
-    Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host ""
-    
-    $scriptFile = Join-Path $scriptPath $ScriptName
-    
-    if ($isWebMode) {
-        # Download and execute from web
-        $url = "https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/$ScriptName"
-        Write-Host "Downloading $ScriptName from GitHub..." -ForegroundColor Yellow
+function Invoke-SetupScript {
+    param([string]$Name, [string[]]$Arguments = @())
+
+    $temporary = $false
+    $path = if ($scriptDirectory) { Join-Path $scriptDirectory $Name } else { $null }
+    if (-not $path -or -not (Test-Path -LiteralPath $path)) {
+        $temporary = $true
+        $path = Join-Path $env:TEMP ("pc-setup-" + [guid]::NewGuid().ToString() + ".ps1")
         try {
-            $scriptContent = (New-Object System.Net.WebClient).DownloadString($url)
-            $tempScript = Join-Path $env:TEMP $ScriptName
-            $scriptContent | Out-File -FilePath $tempScript -Encoding UTF8
-            Write-Host "Executing $ScriptName..." -ForegroundColor Green
-            & powershell.exe -ExecutionPolicy Bypass -File $tempScript
-            Remove-Item $tempScript -Force -ErrorAction SilentlyContinue
+            Invoke-WebRequest -Uri "https://raw.githubusercontent.com/peeweeh/pc-setup/master/win/$Name" -OutFile $path -UseBasicParsing -ErrorAction Stop
         } catch {
-            Write-Host "Failed to download or execute $ScriptName" -ForegroundColor Red
-            Write-Host "Error: $_" -ForegroundColor Red
-            return $false
-        }
-    } else {
-        # Execute from local file
-        if (Test-Path $scriptFile) {
-            Write-Host "Executing $ScriptName..." -ForegroundColor Green
-            & powershell.exe -ExecutionPolicy Bypass -File $scriptFile
-        } else {
-            Write-Host "Script not found: $scriptFile" -ForegroundColor Red
-            Write-Host "Please ensure you're running from the correct directory." -ForegroundColor Yellow
+            Write-Host "Could not download ${Name}: $_" -ForegroundColor Red
+            if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force }
             return $false
         }
     }
-    
-    Write-Host ""
-    Write-Host "Completed: $Description" -ForegroundColor Green
-    Write-Host ""
-    return $true
-}
 
-function Run-AllScripts {
-    Write-Host ""
-    Write-Host "========================================" -ForegroundColor Magenta
-    Write-Host "Running Complete Setup" -ForegroundColor Magenta
-    Write-Host "========================================" -ForegroundColor Magenta
-    Write-Host ""
-    Write-Host "This will run all setup scripts sequentially." -ForegroundColor Yellow
-    Write-Host "Estimated total time: 60-120 minutes" -ForegroundColor Yellow
-    Write-Host ""
-    $confirm = Read-Host "Continue? (Y/N)"
-    
-    if ($confirm -ne 'Y' -and $confirm -ne 'y') {
-        Write-Host "Cancelled." -ForegroundColor Yellow
-        return
-    }
-    
-    $scripts = @(
-        @{Name = "windows_install.ps1"; Desc = "Windows Package Installation"},
-        @{Name = "privacy_tweaks.ps1"; Desc = "Privacy & Security Tweaks"},
-        @{Name = "vscode_extensions.ps1"; Desc = "VS Code Extensions"},
-        @{Name = "dev_setup.ps1"; Desc = "Development Environment Setup"}
-    )
-    
-    $successCount = 0
-    $totalScripts = $scripts.Count
-    
-    foreach ($script in $scripts) {
-        if (Run-Script -ScriptName $script.Name -Description $script.Desc) {
-            $successCount++
+    try {
+        $global:LASTEXITCODE = $null
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $path @Arguments | ForEach-Object { Write-Host $_ }
+        if ($null -eq $LASTEXITCODE -or $LASTEXITCODE -ne 0) {
+            Write-Host "$Name failed with exit code $LASTEXITCODE." -ForegroundColor Red
+            return $false
         }
-        Write-Host "Progress: $successCount/$totalScripts completed" -ForegroundColor Cyan
+        return $true
+    } catch {
+        Write-Host "Could not execute ${Name}: $_" -ForegroundColor Red
+        return $false
+    } finally {
+        if ($temporary -and (Test-Path -LiteralPath $path)) {
+            Remove-Item -LiteralPath $path -Force
+        }
     }
-    
-    Write-Host ""
-    Write-Host "========================================" -ForegroundColor Green
-    Write-Host "Setup Complete!" -ForegroundColor Green
-    Write-Host "========================================" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "Successfully completed: $successCount/$totalScripts scripts" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "IMPORTANT: Please restart your computer for all changes to take effect." -ForegroundColor Yellow
-    Write-Host ""
 }
 
-# Main loop
+Invoke-MatrixRain
+Show-Banner
+Write-Host ''
+Write-Boot -Text 'booting setup menu' -Tag ' OK '
+Write-Boot -Text 'tiers: light, heavy, optimizations' -Tag 'READY'
+Write-Boot -Text 'awaiting selection' -Tag '>>' -Color Yellow
+Write-Host ''
+Write-Host 'PC Setup for Windows' -ForegroundColor Cyan
+Show-Menu
+
 do {
-    Show-Banner
-    Show-Menu
-    
-    $choice = Read-Host "Enter your choice (1-5, Q to quit)"
-    
-    switch ($choice.ToUpper()) {
-        "1" {
-            Run-Script -ScriptName "windows_install.ps1" -Description "Windows Package Installation"
-            Write-Host "Press any key to continue..." -ForegroundColor Gray
-            $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        }
-        "2" {
-            Run-Script -ScriptName "privacy_tweaks.ps1" -Description "Privacy & Security Tweaks"
-            Write-Host "Press any key to continue..." -ForegroundColor Gray
-            $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        }
-        "3" {
-            Run-Script -ScriptName "vscode_extensions.ps1" -Description "VS Code Extensions"
-            Write-Host "Press any key to continue..." -ForegroundColor Gray
-            $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        }
-        "4" {
-            Run-Script -ScriptName "dev_setup.ps1" -Description "Development Environment Setup"
-            Write-Host "Press any key to continue..." -ForegroundColor Gray
-            $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        }
-        "5" {
-            Run-AllScripts
-            Write-Host "Press any key to continue..." -ForegroundColor Gray
-            $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        }
-        "Q" {
-            Write-Host ""
-            Write-Host "Exiting installer. Goodbye!" -ForegroundColor Cyan
-            Write-Host ""
-            exit 0
-        }
-        default {
-            Write-Host ""
-            Write-Host "Invalid choice. Please select 1-5 or Q." -ForegroundColor Red
-            Start-Sleep -Seconds 2
-        }
+    Write-Host '> ' -NoNewline -ForegroundColor White
+    $choice = Read-Host 'Select an option [0-4]'
+    if ($null -eq $choice) { exit 1 }
+    if ($choice -eq 'party') {
+        Invoke-Party
+        Show-Menu
     }
-} while ($true)
+} while ($choice -notin @('0', '1', '2', '3', '4'))
 
-Write-Host ""
-Write-Host "Script by @mrfixit027" -ForegroundColor Cyan
-Write-Host "GitHub: https://github.com/peeweeh/pc-setup" -ForegroundColor Cyan
-Write-Host ""
+if ($choice -eq '0') { exit 0 }
 
-################################################################################
-# End of install.ps1
-# Author: @mrfixit027
-# GitHub: https://github.com/peeweeh/pc-setup
-################################################################################
+if ($choice -in @('3', '4')) {
+    Write-Host "Optimizations restrict diagnostic data, advertising ID, update sharing, online speech, clipboard sync and web search." -ForegroundColor Yellow
+    Write-Host "Effectiveness varies by Windows edition and management policy. You can review background tasks individually." -ForegroundColor Yellow
+    Write-Host "Original settings are saved. Power, visual effects, Defender and update availability are not changed." -ForegroundColor Yellow
+    if ((Read-Host "Continue? [y/N]") -notmatch '^[Yy]$') {
+        Write-Host "Cancelled."
+        exit 0
+    }
+}
+
+if ($choice -in @('1', '2', '4')) {
+    $tier = if ($choice -eq '1') { 'light' } else { 'heavy' }
+    if (-not (Invoke-SetupScript -Name 'windows_install.ps1' -Arguments @('-Tier', $tier))) { exit 1 }
+}
+if ($choice -in @('3', '4')) {
+    if (-not (Invoke-SetupScript -Name 'windows_optimize.ps1')) { exit 1 }
+}
+Write-Host "Setup finished." -ForegroundColor Green

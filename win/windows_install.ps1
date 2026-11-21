@@ -1,3 +1,5 @@
+param([ValidateSet('light', 'heavy')][string]$Tier = 'light')
+
 ################################################################################
 # windows_install.ps1
 # Chocolatey package installation script for Windows
@@ -41,26 +43,33 @@ if ($chocoInstalled) {
     }
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 }
+if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
+    Write-Host "Chocolatey is unavailable after installation; stopping." -ForegroundColor Red
+    exit 1
+}
 
 Write-Host ""
 
 # Step 2: Detect GPU and determine graphics drivers
 Write-Host "Step 2: Detecting GPU..." -ForegroundColor Yellow
 
-$gpu = Get-WmiObject Win32_VideoController | Select-Object -First 1
-$isNvidia = $gpu.Name -match "NVIDIA" -or $gpu.AdapterCompatibility -match "NVIDIA"
-$isAmd = $gpu.Name -match "AMD" -or $gpu.Name -match "Radeon" -or $gpu.AdapterCompatibility -match "Advanced Micro Devices"
-
-if ($isNvidia) {
-    Write-Host "NVIDIA GPU detected: $($gpu.Name)" -ForegroundColor Cyan
-    $gpuPackages = @("nvidia-app", "nvidia-physx")
-} elseif ($isAmd) {
-    Write-Host "AMD GPU detected: $($gpu.Name)" -ForegroundColor Cyan
-    Write-Host "Note: AMD drivers should be downloaded manually from AMD website" -ForegroundColor Yellow
-    $gpuPackages = @()
-} else {
-    Write-Host "Unknown GPU: $($gpu.Name)" -ForegroundColor Yellow
-    $gpuPackages = @()
+$gpuPackages = @()
+try {
+    $gpus = @(Get-CimInstance Win32_VideoController -ErrorAction Stop)
+    $nvidia = @($gpus | Where-Object { $_.Name -match 'NVIDIA' -or $_.AdapterCompatibility -match 'NVIDIA' })
+    $amd = @($gpus | Where-Object { $_.Name -match 'AMD|Radeon' -or $_.AdapterCompatibility -match 'Advanced Micro Devices' })
+    if ($nvidia.Count -gt 0) {
+        Write-Host "NVIDIA GPU detected: $($nvidia.Name -join ', ')" -ForegroundColor Cyan
+        $gpuPackages = @("nvidia-app", "nvidia-physx")
+    }
+    if ($amd.Count -gt 0) {
+        Write-Host "AMD GPU detected; download drivers manually from AMD." -ForegroundColor Yellow
+    }
+    if ($nvidia.Count -eq 0 -and $amd.Count -eq 0) {
+        Write-Host "No supported NVIDIA or AMD GPU detected." -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "Could not detect GPUs; GPU packages will be skipped: $_" -ForegroundColor Yellow
 }
 
 Write-Host ""
@@ -69,79 +78,6 @@ Write-Host ""
 Write-Host "Step 3: Installing Chocolatey packages..." -ForegroundColor Yellow
 Write-Host ""
 
-$packages = @(
-    "1password",
-    "7zip.install",
-    "bat",
-    "beeper-app",
-    "brave",
-    "calibre",
-    "chatgpt",
-    "chocolateygui",
-    "clipchamp",
-    "curl",
-    "ddu",
-    "discord.install",
-    "dotnet-desktopruntime",
-    "ea-app",
-    "epicgameslauncher",
-    "everything",
-    "fd",
-    "ffmpeg",
-    "fzf",
-    "gh",
-    "git.install",
-    "git-delta",
-    "github-desktop",
-
-    "goggalaxy",
-    "GoogleChrome",
-    "googledrive",
-    "hwinfo.install",
-    "hwmonitor.install",
-    "icloud",
-    "iTunes",
-    "jq",
-    "less",
-    "linqpad",
-    "microsoft-edge",
-    "microsoft-teams",
-    "microsoft-windows-terminal",
-    "msiafterburner",
-    "neovim",
-    "nodejs.install",
-    "obsidian",
-    "pandoc",
-    "plexmediaplayer",
-    "postman",
-    "powertoys",
-    "protondrive",
-    "protonmail",
-    "protonvpn",
-    "python314",
-    "ripgrep",
-    "rivatuner",
-    "sabnzbd",
-    "signal",
-    "slack",
-    "starship.install",
-    "steam",
-    "steelseries-gg",
-    "sysinternals",
-    "telegram.install",
-    "treesizefree",
-    "ubisoft-connect",
-    "vlc.install",
-    "vscode.install",
-    "webview2-runtime",
-    "whatsapp",
-    "winrar",
-    "wireshark",
-    "wiztree",
-    "zoxide",
-    "zoom"
-)
-
 $successCount = 0
 $failCount = 0
 $failedPackages = @()
@@ -149,12 +85,12 @@ $skippedPackages = @()
 
 function Install-PackageGroup {
     param($GroupName, $Packages, $SkipPrompt = $false)
-    
+
     Write-Host ""
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host "Installing $GroupName" -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Cyan
-    
+
     if (-not $SkipPrompt) {
         Write-Host "Packages to install: $($Packages.Count)" -ForegroundColor Yellow
         Write-Host "Press Enter to continue, or type 'skip' to skip this group..." -ForegroundColor Yellow
@@ -165,15 +101,16 @@ function Install-PackageGroup {
             return
         }
     }
-    
+
     Write-Host ""
-    
+
     foreach ($package in $Packages) {
         Write-Host "Installing $package..." -ForegroundColor Cyan
         try {
-            choco install $package -y --ignore-checksums
-            if ($LASTEXITCODE -eq 0) {
+            choco install $package -y
+            if ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq 3010) {
                 Write-Host "- $package installed successfully" -ForegroundColor Green
+                if ($LASTEXITCODE -eq 3010) { Write-Host "  Restart required for $package." -ForegroundColor Yellow }
                 $script:successCount++
             } else {
                 Write-Host "- Failed to install $package" -ForegroundColor Red
@@ -268,105 +205,58 @@ $optionalPackages = @(
     "zoom"
 )
 
-# Install GPU drivers if detected (automatic, no prompt)
-if ($gpuPackages.Count -gt 0) {
-    Install-PackageGroup -GroupName "GPU Drivers" -Packages $gpuPackages -SkipPrompt $true
+function Get-PackageSelection {
+    param([string]$Tier, [string[]]$Essential, [string[]]$Optional)
+    $heavy = @(
+        "protonmail", "protonvpn", "protondrive", "googledrive", "onedrive",
+        "microsoft-teams", "windows-app", "amazon-workspaces", "docker-desktop", "figma", "ollama", "steam",
+        "ea-app", "epicgameslauncher", "goggalaxy", "ubisoft-connect",
+        "icloud", "iTunes", "plexmediaplayer"
+    )
+    $additional = @(
+        "1password-cli", "helium", "comet-browser", "claude", "sourcetree", "warp-terminal",
+        "devtoys", "awscli", "uv", "nerd-fonts-firacode", "nerd-fonts-hack",
+        "actionlint", "eza", "golang", "github-copilot-cli", "pipx", "python315",
+        "ruff", "tailscale", "onedrive", "windows-app", "amazon-workspaces",
+        "docker-desktop", "figma", "ollama"
+    )
+    $selected = @($Essential + $Optional + $additional | Select-Object -Unique)
+    if ($Tier -eq 'light') {
+        $selected = @($selected | Where-Object { $_ -notin $heavy })
+    }
+    return $selected
 }
+$packagesToInstall = @(Get-PackageSelection -Tier $Tier -Essential $essentialPackages -Optional $optionalPackages)
+if ($Tier -eq 'heavy' -and $gpuPackages.Count -gt 0) {
+    Install-PackageGroup -GroupName "GPU Packages" -Packages $gpuPackages -SkipPrompt $true
+}
+Install-PackageGroup -GroupName "$Tier packages" -Packages $packagesToInstall -SkipPrompt $true
 
-# Install essential packages
-Install-PackageGroup -GroupName "Essential Packages" -Packages $essentialPackages
-
-Write-Host ""
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Windows Privacy and Performance Tweaks" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host ""
-
-Write-Host "Applying Windows tweaks..." -ForegroundColor Yellow
-Write-Host ""
-
-$tweakCount = 0
-$tweakErrors = 0
-
-function Set-RegistryValue {
-    param($Path, $Name, $Value, $Type = "DWord")
+Write-Host "Checking Hermes Agent..." -ForegroundColor Cyan
+$hermesHome = if ($env:HERMES_HOME) { $env:HERMES_HOME } else { Join-Path $env:LOCALAPPDATA 'hermes' }
+if ((Get-Command hermes -ErrorAction SilentlyContinue) -or (Test-Path -LiteralPath (Join-Path $hermesHome 'hermes-agent'))) {
+    Write-Host "Hermes already exists; leaving it unchanged." -ForegroundColor Green
+} else {
+    $hermesInstaller = Join-Path $env:TEMP ("hermes-install-" + [guid]::NewGuid().ToString() + ".ps1")
     try {
-        if (!(Test-Path $Path)) {
-            New-Item -Path $Path -Force | Out-Null
-        }
-        Set-ItemProperty -Path $Path -Name $Name -Value $Value -Type $Type -Force
-        return $true
+        Invoke-WebRequest -Uri 'https://hermes-agent.nousresearch.com/install.ps1' -OutFile $hermesInstaller -UseBasicParsing -ErrorAction Stop
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $hermesInstaller -NonInteractive
+        if ($LASTEXITCODE -ne 0) { throw "Hermes installer exited with code $LASTEXITCODE." }
+        Write-Host "Hermes installed. Run 'hermes setup' in a new terminal." -ForegroundColor Green
     } catch {
-        return $false
+        Write-Host "Hermes installation failed: $_" -ForegroundColor Red
+        $failCount++
+        $failedPackages += 'Hermes Agent'
+    } finally {
+        if (Test-Path -LiteralPath $hermesInstaller) { Remove-Item -LiteralPath $hermesInstaller -Force }
     }
 }
-
-# Create system restore point
-Write-Host "- Creating system restore point..." -ForegroundColor Cyan
-try {
-    Enable-ComputerRestore -Drive "$env:SystemDrive"
-    Checkpoint-Computer -Description "Before PC Setup Tweaks" -RestorePointType "MODIFY_SETTINGS"
-    $tweakCount++
-} catch {
-    Write-Host "  Could not create restore point (might need to be enabled)" -ForegroundColor Yellow
-    $tweakErrors++
-}
-
-# Delete temporary files
-Write-Host "- Deleting temporary files..." -ForegroundColor Cyan
-try {
-    Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
-    $tweakCount++
-} catch {
-    $tweakErrors++
-}
-
-# Disable Hibernation (performance)
-Write-Host "- Disabling hibernation..." -ForegroundColor Cyan
-try {
-    powercfg.exe /hibernate off | Out-Null
-    $tweakCount++
-} catch {
-    $tweakErrors++
-}
-
-# Enable End Task with Right Click (convenience)
-Write-Host "- Enabling end task with right click..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" "TaskbarEndTask" 1) { $tweakCount++ } else { $tweakErrors++ }
-
-# Disable Autoplay (performance)
-Write-Host "- Disabling autoplay..." -ForegroundColor Cyan
-if (Set-RegistryValue "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" "DisableAutoplay" 1) { $tweakCount++ } else { $tweakErrors++ }
-
-# Set Delivery Optimization to manual (can use data)
-Write-Host "- Setting Delivery Optimization to manual..." -ForegroundColor Cyan
-try {
-    Set-Service -Name "DoSvc" -StartupType Manual -ErrorAction SilentlyContinue
-    $tweakCount++
-} catch {
-    $tweakErrors++
-}
-
-Write-Host ""
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Tweaks Summary" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Successfully applied: $tweakCount tweaks" -ForegroundColor Green
-if ($tweakErrors -gt 0) {
-    Write-Host "Failed: $tweakErrors tweaks" -ForegroundColor Red
-}
-
-Write-Host ""
-
-# Install optional packages
-Install-PackageGroup -GroupName "Optional Packages" -Packages $optionalPackages
 
 # Step 5: Final Summary
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Installation Summary" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Total packages: $($essentialPackages.Count + $optionalPackages.Count + $gpuPackages.Count)" -ForegroundColor White
+Write-Host "Selected tier: $Tier" -ForegroundColor White
 Write-Host "Successfully installed: $successCount" -ForegroundColor Green
 Write-Host "Failed: $failCount" -ForegroundColor $(if ($failCount -gt 0) { "Red" } else { "Green" })
 
@@ -384,6 +274,10 @@ if ($failedPackages.Count -gt 0) {
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
+if ($failCount -gt 0) {
+    Write-Host "Setup completed with package failures." -ForegroundColor Red
+    exit 1
+}
 Write-Host "Setup Complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""

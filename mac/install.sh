@@ -20,6 +20,10 @@ NC='\033[0m' # No Color
 
 # GitHub raw content base URL
 GITHUB_RAW="https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac"
+SCRIPT_DIR=""
+if [[ -f "${BASH_SOURCE[0]}" ]]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
 
 # Function to print colored output
 print_header() {
@@ -91,103 +95,233 @@ fetch_script() {
   return $status
 }
 
-# Welcome banner
-clear
-print_header "macOS Setup - Interactive Installer"
-echo -e "${CYAN}Author: mrfixit027 | https://github.com/peeweeh/pc-setup${NC}\n"
+run_setup_script() {
+    local script="$1"
+    shift
+    if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/$script" ]]; then
+        /bin/bash "$SCRIPT_DIR/$script" "$@"
+    else
+        fetch_script "$GITHUB_RAW/$script" || {
+            print_error "Failed to fetch $script"
+            return 1
+        }
+        /bin/bash -c "$FETCHED_SCRIPT" "$script" "$@"
+    fi
+}
 
-echo -e "${BOLD}Available Setup Scripts:${NC}"
+ESC=$'\033'
+GREEN=$'\033[0;32m'
+YELLOW=$'\033[1;33m'
+CYAN=$'\033[0;36m'
+BOLD=$'\033[1m'
+NC=$'\033[0m'
+PHOSPHOR="${ESC}[38;5;46m"
+DIM_PHOSPHOR="${ESC}[38;5;22m"
+BRIGHT="${ESC}[1;97m"
+ANIMATE=0
+if [[ -t 1 && -z "${PC_SETUP_NO_ANIM:-}" && "${TERM:-dumb}" != dumb ]]; then
+    ANIMATE=1
+fi
+trap 'printf "%s[0m%s[?25h" "$ESC" "$ESC"' EXIT
+
+pause() {
+    if (( ANIMATE )); then sleep "$1"; fi
+    return 0
+}
+
+typewrite() {
+    local text="$1" delay="${2:-0.01}" i
+    if (( ! ANIMATE )); then
+        printf '%s' "$text"
+        return 0
+    fi
+    for (( i = 0; i < ${#text}; i++ )); do
+        printf '%s' "${text:i:1}"
+        sleep "$delay"
+    done
+}
+
+matrix_rain() {
+    (( ANIMATE )) || return 0
+    local rows cols glyphs='0123456789ABCDEF<>/\|*+-=' frame c r i
+    local -a heads=()
+    rows=$(tput lines 2>/dev/null) || rows=24
+    cols=$(tput cols 2>/dev/null) || cols=80
+    for (( c = 1; c <= cols; c += 2 )); do
+        heads[c]=$(( RANDOM % rows + 1 ))
+    done
+    printf '%s[2J%s[?25l' "$ESC" "$ESC"
+    for (( i = 0; i < 30; i++ )); do
+        frame=''
+        for c in "${!heads[@]}"; do
+            r=${heads[c]}
+            if (( r > 1 )); then
+                frame+="${ESC}[$((r - 1));${c}H${PHOSPHOR}${glyphs:$(( RANDOM % ${#glyphs} )):1}"
+            fi
+            frame+="${ESC}[${r};${c}H${BRIGHT}${glyphs:$(( RANDOM % ${#glyphs} )):1}"
+            heads[c]=$(( r >= rows ? 1 : r + 1 ))
+        done
+        printf '%s' "$frame"
+        sleep 0.04
+    done
+    printf '%s[2J%s[H%s' "$ESC" "$ESC" "$NC"
+}
+
+show_banner() {
+    local line i
+    if (( ! ANIMATE )); then
+        for line in "$@"; do printf '%s%s%s\n' "$PHOSPHOR" "$line" "$NC"; done
+        return 0
+    fi
+    printf '%s[?25l' "$ESC"
+    for line in "$@"; do
+        printf '%s%s%s\n' "$PHOSPHOR" "$line" "$NC"
+        sleep 0.05
+    done
+    for (( i = 0; i < 2; i++ )); do
+        printf '%s[%dA' "$ESC" "$#"
+        for line in "$@"; do printf '%s%s%s\n' "$BRIGHT" "$line" "$NC"; done
+        sleep 0.07
+        printf '%s[%dA' "$ESC" "$#"
+        for line in "$@"; do printf '%s%s%s\n' "$PHOSPHOR" "$line" "$NC"; done
+        sleep 0.07
+    done
+    printf '%s[?25h' "$ESC"
+}
+
+boot_line() {
+    printf '%s' "$DIM_PHOSPHOR"
+    typewrite "$1" 0.008
+    printf ' %s[%s]%s\n' "$2" "$3" "$NC"
+    pause 0.1
+}
+
+party_mode() {
+    if (( ! ANIMATE )); then
+        print_info "Party mode needs an interactive terminal."
+        return 0
+    fi
+    local -a colours=(196 208 226 46 51 21 201)
+    local line i n=${#PC_SETUP_BANNER[@]}
+    matrix_rain
+    for line in "${PC_SETUP_BANNER[@]}"; do printf '%s\n' "$line"; done
+    for (( i = 0; i < 28; i++ )); do
+        printf '%s[%dA' "$ESC" "$n"
+        for line in "${PC_SETUP_BANNER[@]}"; do
+            printf '%s[1;38;5;%sm%s%s\n' "$ESC" "${colours[i % ${#colours[@]}]}" "$line" "$NC"
+        done
+        sleep 0.08
+    done
+    printf '%s[2J%s[H' "$ESC" "$ESC"
+}
+
+menu_item() {
+    printf '  %s[%s]%s %s%s%s ' "$BRIGHT" "$1" "$NC" "$BOLD" "$2" "$NC"
+    printf '%s' "$PHOSPHOR"
+    typewrite "$3" 0.004
+    printf '%s\n' "$NC"
+}
+
+print_menu() {
+    menu_item 1 "Install Light" "Core apps, developer tools, fonts and shell"
+    menu_item 2 "Install Heavy" "Light + Office, Docker, cloud and other large apps"
+    menu_item 3 "Install Optimizations" "Performance, UI and privacy hardening (advanced: cache/log clearing and system changes)"
+    menu_item 4 "Install ALL" "Heavy apps followed by optimizations"
+    print_warning "App installation also attempts to remove all login items and disable new LaunchAgents."
+    menu_item 0 "Exit" ""
+    echo ""
+}
+
+PC_SETUP_BANNER=(
+    "██████╗  ██████╗    ███████╗███████╗████████╗██╗   ██╗██████╗ "
+    "██╔══██╗██╔════╝    ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗"
+    "██████╔╝██║         ███████╗█████╗     ██║   ██║   ██║██████╔╝"
+    "██╔═══╝ ██║         ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝ "
+    "██║     ╚██████╗    ███████║███████╗   ██║   ╚██████╔╝██║     "
+    "╚═╝      ╚═════╝    ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝     "
+)
+
+matrix_rain
+show_banner "${PC_SETUP_BANNER[@]}"
+printf '\n'
+boot_line "booting setup menu" "$PHOSPHOR" " OK "
+boot_line "tiers: light, heavy, optimizations" "$PHOSPHOR" "READY"
+boot_line "awaiting selection" "$YELLOW" ">>"
+printf '\n'
+echo -e "${CYAN}Author: mrfixit027 | https://github.com/peeweeh/pc-setup${NC}"
 echo ""
-echo -e "${GREEN}1.${NC} ${BOLD}brew_install.sh${NC}     - Install applications via Homebrew"
-echo -e "   ${CYAN}→${NC} 2 tiers: Fast / Slow (Fast + Office, Docker, cloud, heavy apps)"
-echo -e "   ${CYAN}→${NC} Configures shell with Powerlevel10k"
-echo -e "   ${CYAN}→${NC} Sudo handled once upfront (no repeated prompts)"
-echo -e "   ${CYAN}→${NC} Disables login items/background agents for installed apps"
-echo -e "   ${YELLOW}⏱${NC}  ~15-70 minutes (depends on tier)"
-echo ""
-echo -e "${GREEN}2.${NC} ${BOLD}mac_optimize.sh${NC}     - Performance, UI & privacy hardening ${YELLOW}(combined)${NC}"
-echo -e "   ${CYAN}→${NC} Disables AI analysis (Photos, Media) - huge battery saver"
-echo -e "   ${CYAN}→${NC} Instant animations, faster UI, Dock/Finder/Trackpad config"
-echo -e "   ${CYAN}→${NC} Comprehensive Siri disabling & telemetry blocking"
-echo -e "   ${CYAN}→${NC} Security hardening, cache/log cleaning"
-echo -e "   ${YELLOW}⚠${NC}  Advanced - review before running"
-echo -e "   ${YELLOW}⏱${NC}  ~5-10 minutes"
-echo ""
-echo -e "${GREEN}3.${NC} ${BOLD}Install ALL${NC}         - Run all scripts in sequence"
-echo -e "   ${YELLOW}⏱${NC}  ~15-70 minutes total"
-echo ""
-echo -e "${GREEN}0.${NC} ${BOLD}Exit${NC}"
-echo ""
+print_menu
 
 # Get user choice
 while true; do
-    echo -ne "${BOLD}Select an option [0-3]: ${NC}"
-    read -r choice
+    printf '%s> %sSelect an option [0-4]: %s' "$BRIGHT" "$BOLD" "$NC"
+    if ! read -r choice; then
+        print_error "No option selected."
+        exit 1
+    fi
     
     case $choice in
         1)
-            print_header "Installing Applications (brew_install.sh)"
-            fetch_script "${GITHUB_RAW}/brew_install.sh" || { print_error "Failed to fetch brew_install.sh"; exit 1; }
-            /bin/bash -c "$FETCHED_SCRIPT"
+            print_header "Installing Light Applications"
+            run_setup_script "brew_install.sh" light
             break
             ;;
         2)
+            print_header "Installing Light and Heavy Applications"
+            run_setup_script "brew_install.sh" heavy
+            break
+            ;;
+        3)
             print_header "Optimizing System & Hardening Privacy (mac_optimize.sh)"
             print_warning "This is an advanced script covering performance/UI tweaks plus"
             print_warning "cache/log clearing, telemetry blocking, and privacy hardening."
             echo -ne "${YELLOW}Are you sure you want to continue? [y/N]: ${NC}"
             read -r confirm
             if [[ $confirm =~ ^[Yy]$ ]]; then
-                fetch_script "${GITHUB_RAW}/mac_optimize.sh" || { print_error "Failed to fetch mac_optimize.sh"; exit 1; }
-                /bin/bash -c "$FETCHED_SCRIPT"
+                run_setup_script "mac_optimize.sh"
             else
                 print_info "Skipped mac_optimize.sh"
             fi
             break
             ;;
-        3)
+        4)
             print_header "Installing ALL Scripts"
-            echo -ne "${YELLOW}This will run all setup scripts. Continue? [y/N]: ${NC}"
+            print_warning "This installs heavy apps and runs the advanced optimization and privacy script."
+            print_warning "Optimizations include system changes and cache/log clearing."
+            echo -ne "${YELLOW}Continue? [y/N]: ${NC}"
             read -r confirm
             if [[ ! $confirm =~ ^[Yy]$ ]]; then
                 print_info "Installation cancelled."
                 exit 0
             fi
             
-            # Step 1: brew_install.sh
             print_header "Step 1/2: Installing Applications"
-            fetch_script "${GITHUB_RAW}/brew_install.sh" || { print_error "Failed to fetch brew_install.sh"; exit 1; }
-            /bin/bash -c "$FETCHED_SCRIPT" || {
+            run_setup_script "brew_install.sh" heavy || {
                 print_error "brew_install.sh failed. Stopping."
                 exit 1
             }
             
-            # Step 2: mac_optimize.sh (optional, advanced)
-            print_header "Step 2/2: Optimizing System & Hardening Privacy (Optional)"
-            print_warning "This is an advanced script covering performance/UI tweaks plus"
-            print_warning "cache/log clearing, telemetry blocking, and privacy hardening."
-            echo -ne "${YELLOW}Run mac_optimize.sh? [y/N]: ${NC}"
-            read -r optimize_confirm
-            if [[ $optimize_confirm =~ ^[Yy]$ ]]; then
-                fetch_script "${GITHUB_RAW}/mac_optimize.sh" || { print_error "Failed to fetch mac_optimize.sh"; }
-                /bin/bash -c "$FETCHED_SCRIPT" || {
-                    print_error "mac_optimize.sh failed. Continuing..."
-                }
-            else
-                print_info "Skipped mac_optimize.sh"
-            fi
+            print_header "Step 2/2: Optimizing System & Hardening Privacy"
+            run_setup_script "mac_optimize.sh" || {
+                print_error "mac_optimize.sh failed."
+                exit 1
+            }
             
             print_header "Installation Complete!"
-            print_info "${GREEN}All selected scripts have been executed.${NC}"
+            print_info "All setup scripts have been executed."
             print_warning "Please restart your Mac for all changes to take full effect."
             break
+            ;;
+        party)
+            party_mode
+            print_menu
             ;;
         0)
             print_info "Exiting installer."
             exit 0
             ;;
         *)
-            print_error "Invalid option. Please enter 0-3."
+            print_error "Invalid option. Please enter 0-4."
             ;;
     esac
 done
