@@ -122,7 +122,8 @@ chmod +x *.sh
 Light plus the heavier/slower items. The main menu passes the selected tier directly.
 
 **Light tier**:
-- Core utilities: 1Password, Comet, BetterMouse, Clipy, Moom, Rectangle, Raycast, Task Manager TMOG, The Unarchiver
+- Core utilities: 1Password, Comet, BetterMouse, Clipy, CrossOver, Moom, Rectangle, Raycast, Task Manager TMOG, The Unarchiver
+- Creative & AI: ArtCraft and ArtCraft Launcher (the launcher updates itself)
 - Dev tools: GitHub Desktop, Postman, Sourcetree, VS Code, Warp, DevToys, Copilot CLI
 - Browsers: Brave, Google Chrome, Helium
 - Communication: Signal, Telegram, WhatsApp, Discord, Slack, Beeper

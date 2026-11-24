@@ -14,6 +14,11 @@ powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercon
 bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/mac/install.sh)
 ```
 
+### Omarchy (run as your normal user, not root)
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/peeweeh/pc-setup/master/omarchy/install.sh)
+```
+
 **Windows** installer opens a menu with 4 options:
 1. **Install Light** (core apps, development tools and fonts)
 2. **Install Heavy** (Light plus cloud, Docker, games and other large apps)
@@ -253,6 +258,7 @@ included.
 
 #### Development
 - Git, AWS CLI, AWS Nuke, Visual Studio Code, Docker, Postman, DevToys
+- CocoaPods (CLI tools)
 - Hermes Agent (official shell installer, not Homebrew)
 
 #### Browsers
@@ -262,6 +268,7 @@ included.
 - 1Password
 - Rectangle (window management)
 - Claude, ChatGPT, Perplexity
+- ArtCraft and ArtCraft Launcher (creative and AI)
 - Microsoft Word, Excel, PowerPoint and Outlook (official Microsoft installers)
 - Yogurt (official Homebrew tap; Apple Silicon, macOS 14.4+)
 
@@ -273,10 +280,10 @@ included.
 - VLC
 
 #### Utilities
-- Google Drive, OneDrive, Proton VPN, Task Manager TMOG
+- Google Drive, OneDrive, Proton VPN, Task Manager TMOG, CrossOver (runs Windows apps)
 
 #### CLI Tools
-- actionlint, bash, bat, coreutils, fzf, eza, tailscale
+- actionlint, bash, bat, coreutils, fzf, eza, tailscale, lame
 - Powerlevel10k
 
 ---

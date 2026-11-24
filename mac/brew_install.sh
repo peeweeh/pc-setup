@@ -145,11 +145,16 @@ light_apps=(
   comet
   bettermouse
   clipy
+  crossover
   moom
   rectangle
   raycast
   task-manager-tmog
   the-unarchiver
+
+  # Creative & AI
+  artcraft
+  artcraft-launcher
 
   # Dev tools
   github
@@ -536,6 +541,10 @@ cli_tools=(
   isort
   flake8
   vulture
+
+  # Developer SDKs and audio
+  cocoapods
+  lame
 )
 
 homebrew_dependencies=(
